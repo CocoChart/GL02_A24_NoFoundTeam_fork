@@ -48,3 +48,33 @@ function findAvailableRooms(schedule, time, capacity) {
 }
 
 console.log(findAvailableRooms(scheduleAB, 'J 10:00-12:00', 20));
+
+// Aurélien 2. Accèder aux créneaux disponibles d'une salle donnée avec la capacité max de la salle
+
+// Maé 3. Rechercher les salles et les créneaux horaires d'un cours donné 
+
+// Fonction pour rechercher les salles et créneaux horaires d'un cours donné
+function findCourseSchedule(schedule, courseName) {
+    const result = [];
+
+    // Parcours de tous les cours dans le planning
+    Object.values(schedule).forEach(courseList => {
+        courseList.forEach(course => {
+            // Si le nom du cours correspond à celui recherché
+            if (courseName.toLowerCase() === course.toLowerCase()) {
+                result.push({
+                    room: course.room,
+                    time: course.time
+                });
+            }
+        });
+    });
+
+    return result;
+}
+
+// 4. Trouver la capacité maximale d'une salle donnée (Etape utilisée en 1)
+// 5. Classer les salles par capacité d'accueil max 
+// 6. Visualiser le taux d'occupation des salles 
+// 7. Générer un fichier iCalendar entre deux dates données pour des cours sélectionnés 
+
