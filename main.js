@@ -20,6 +20,7 @@ console.log(scheduleAll);
 
 
 //Fonctionnalités à implémenter
+// 0. Creer le menu de l'application
 // 1. Vérifier l'occupation d'une salle et  Trouver les salles disponibles pour un créneau donné avec les capacités 
 // 2. Accèder aux créneaux disponibles d'une salle donnée avec la capacité max de la salle
 // 3. Rechercher les salles et les créneaux horaires d'un cours donné 
