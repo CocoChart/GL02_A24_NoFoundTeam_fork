@@ -20,11 +20,11 @@ console.log(scheduleAll);
 
 
 //Fonctionnalités à implémenter
-// 0. Creer le menu de l'application
-// 1. Vérifier l'occupation d'une salle et  Trouver les salles disponibles pour un créneau donné avec les capacités 
-// 2. Accèder aux créneaux disponibles d'une salle donnée avec la capacité max de la salle
-// 3. Rechercher les salles et les créneaux horaires d'un cours donné 
-// 4. Trouver la capacité maximale d'une salle donnée
+// Aurélien 0. Faire le menu 
+// Lila 1. Vérifier l'occupation d'une salle et  Trouver les salles disponibles pour un créneau donné avec les capacités 
+// Aurélien 2. Accèder aux créneaux disponibles d'une salle donnée avec la capacité max de la salle
+// Maé 3. Rechercher les salles et les créneaux horaires d'un cours donné 
+// Fait 4. Trouver la capacité maximale d'une salle donnée
 // 5. Classer les salles par capacité d'accueil max 
 // 6. Visualiser le taux d'occupation des salles 
 // 7. Générer un fichier iCalendar entre deux dates données pour des cours sélectionnés 
