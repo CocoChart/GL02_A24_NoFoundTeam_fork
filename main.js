@@ -73,8 +73,42 @@ function findCourseSchedule(schedule, courseName) {
     return result;
 }
 
+// Appel de la fonction
+const sortedResult = findCourseSchedule(schedule, courseName);
+
+// Affichage des des salles et créneaux horaires d'un cours
+console.log(sortedResult);
+
 // 4. Trouver la capacité maximale d'une salle donnée (Etape utilisée en 1)
 // 5. Classer les salles par capacité d'accueil max 
+
+//Fonction qui classe les salles en fonction de leur capacité d'accueil
+function geRoomsByCapcity(schedule) {
+    const rooms = [];
+
+    // Parcours de tous les cours dans le planning
+    Object.values(schedule).forEach(courseList => {
+        courseList.forEach(course => {
+            // Ajouter la salle avec sa capacité au tableau rooms
+                rooms.push({
+                    room: course.room,
+                    capacity: course.capacity
+                });
+        });
+    });
+
+    // Trier les salles par capacité (du plus grand au plus petit)
+    rooms.sort((a, b) => b.capacity - a.capacity);
+
+    return rooms;
+}
+
+// Appel de la fonction
+const sortedRooms = getRoomsByCapacity(schedule);
+
+// Affichage des salles triées
+console.log(sortedRooms);
+
 // 6. Visualiser le taux d'occupation des salles 
 // 7. Générer un fichier iCalendar entre deux dates données pour des cours sélectionnés 
 
