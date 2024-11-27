@@ -1,7 +1,7 @@
 const { parseFile } = require('./parser');
 const fs = require('fs');
 
-
+// Function to parse the files 
 function parseAllFiles(folderPath) {
     const allCourses = [];
     const files = fs.readdirSync(folderPath);
@@ -14,9 +14,11 @@ function parseAllFiles(folderPath) {
 
     return allCourses;
 }
-const scheduleAll = parseAllFiles('./SujetA_data');
 
-//console.log(scheduleAll);
+
+
+
+
 
 
 
@@ -26,12 +28,14 @@ const scheduleAll = parseAllFiles('./SujetA_data');
 // Aurélien 2. Accèder aux créneaux disponibles d'une salle donnée avec la capacité max de la salle
 // Maé 3. Rechercher les salles et les créneaux horaires d'un cours donné 
 // Fait 4. Trouver la capacité maximale d'une salle donnée
-// 5. Classer les salles par capacité d'accueil max 
-// 6. Visualiser le taux d'occupation des salles 
+// Mae 5. Classer les salles par capacité d'accueil max 
+// Lila 6. Visualiser le taux d'occupation des salles 
 // 7. Générer un fichier iCalendar entre deux dates données pour des cours sélectionnés 
 
 
-// 1. Vérifier l'occupation d'une salle et  Trouver les salles disponibles pour un créneau donné avec les capacités
+
+
+// Lila 1. Vérifier l'occupation d'une salle et  Trouver les salles disponibles pour un créneau donné avec les capacités
 function isRoomOccupied(schedule, room, time) {
     const courses = Object.values(schedule);
     for (let course of courses) {
@@ -64,7 +68,6 @@ function findAvailableRooms(schedule, time, capacity) {
             listRooms.push(course.room);
         }  
     }
-
     for (const room of listRooms) {
         const roomOccupied = isRoomOccupied(schedule, room, time);
         const roomCapacity = getRoomCapacity(schedule, room);
@@ -76,24 +79,6 @@ function findAvailableRooms(schedule, time, capacity) {
 
     return availableRooms;
 }
-
-//console.log(findAvailableRooms(scheduleAB, 'J 10:00-12:00', 20));
-console.log(isRoomOccupied(scheduleAll, 'P101', 'ME 10:00-12:00')); 
-console.log(getRoomCapacity(scheduleAll, 'B103'));
-console.log(findAvailableRooms(scheduleAll, 'ME 10:00-12:00', 30));
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -124,14 +109,15 @@ function findCourseSchedule(schedule, courseName) {
     return result;
 }
 
-// Appel de la fonction
-//const sortedResult = findCourseSchedule(schedule, courseName);
 
-// Affichage des des salles et créneaux horaires d'un cours
-//console.log(sortedResult);
 
-// 4. Trouver la capacité maximale d'une salle donnée (Etape utilisée en 1)
-// 5. Classer les salles par capacité d'accueil max 
+
+
+
+
+
+// Lila 4. Trouver la capacité maximale d'une salle donnée (Etape utilisée en 1)
+// Mae 5. Classer les salles par capacité d'accueil max 
 
 //Fonction qui classe les salles en fonction de leur capacité d'accueil
 function geRoomsByCapcity(schedule) {
@@ -154,13 +140,32 @@ function geRoomsByCapcity(schedule) {
     return rooms;
 }
 
-// Appel de la fonction
-//const sortedRooms = getRoomsByCapacity(schedule);
 
-// Affichage des salles triées
-//console.log(sortedRooms);
+
+
+
+
 
 // Lila 6. Visualiser le taux d'occupation des salles 
+
+function getNumberOccupation(schedule) {
+    const roomHoursOccupancy = {};  // Dictionary to store room ID and its occupation count
+    const percentageOccupancy = {};  // Dictionary to store room ID and its occupation percentage
+    const courses = Object.values(schedule);
+    courses.sort((a, b) => a.room.localeCompare(b.room));
+    
+    for (const course of courses) {
+        if (!roomHoursOccupancy[course.room]) {
+            roomHoursOccupancy[course.room] = 0;        
+        }
+        roomHoursOccupancy[course.room]+=2;  // Increment the count for this room
+    }
+    for (const course of courses){
+        percentageOccupancy[course.room] = (roomHoursOccupancy[course.room] / 60) * 100;
+    }
+    
+    return [roomHoursOccupancy, percentageOccupancy];  // Return the dictionary with room IDs and their occupation counts
+}
 
 
 
@@ -170,3 +175,32 @@ function geRoomsByCapcity(schedule) {
 
 // 7. Générer un fichier iCalendar entre deux dates données pour des cours sélectionnés 
 
+
+
+// Tests
+
+function test() {
+    const scheduleAll = parseAllFiles('./SujetA_data');
+    //test 1 
+    console.log(isRoomOccupied(scheduleAll, 'P101', 'ME 10:00-12:00')); 
+    console.log(getRoomCapacity(scheduleAll, 'B103'));
+    console.log(findAvailableRooms(scheduleAll, 'ME 10:00-12:00', 30));
+
+    //test 3
+    const sortedResult = findCourseSchedule(scheduleAll, 'AP03');
+    //Affichage des des salles et créneaux horaires d'un cours
+    console.log(sortedResult);
+
+    //test 5
+    const sortedRooms = geRoomsByCapcity(scheduleAll);
+    //Affichage des salles triées par capacité
+    console.log(sortedRooms);
+
+    //test 6
+    const [roomHoursOccupancy, percentageOccupancy] = getNumberOccupation(scheduleAll);
+    console.log(roomHoursOccupancy);
+    console.log(percentageOccupancy);
+
+}
+
+test();
