@@ -208,11 +208,12 @@ const question = require('prompt-sync')({sigint: true});
 
 
 function MenuPrincipal() {
+    const scheduleAll = parseAllFiles('./SujetA_data');
     console.log("\n=== Menu Principal ===");
     console.log("1. Afficher les créneaux disponibles d'une salle donnée");
     console.log("2. Afficher si une salle est occupée à un créneau donné");
     console.log("3. Afficher les salles et créneaux horaires d'un cours donné");
-    console.log("4. Afficher les salles disponibles à un créneau donné");
+    console.log("4. Afficher les salles disponibles à un créneau et une capacité donnés");
     console.log("5. Afficher les salles triées par capacité");
     console.log("6. Visualiser le taux d'occupation des salles");
     console.log("7. Générer un fichier iCalendar");
@@ -223,10 +224,31 @@ function MenuPrincipal() {
     let option = question("Choisissez une option: ");
     switch (option.trim()) {
         case "1":
-            let salle = question("\tSalle : ");
-            console.log(salle);
+            let salle1 = question("\tSalle (ex : P101): ");
+            console.log("????");
             break;
-    }
+        case "2":
+            let salle2 = question("\tSalle (ex : P101): ");
+            let heure = question("\tHoraire (ex : ME 10:00-12:00) : ");
+                if (isRoomOccupied(scheduleAll, salle2, heure)) {
+                    console.log(`La salle ${salle2} est occupée à ${heure}`);
+                    console.log("RECHERCHER QUEL COURS OCCUPE")
+                } else {
+                    console.log(`La salle ${salle2} est libre à ${heure}`);
+                }
+            
+            break;
+        case "3":
+            let cours = question("\tNom du cours (ex : AP03): ");
+            break;
+        case "4":
+            let heure2 = question("\tHoraire (ex : ME 10:00-12:00) : ");
+            let capacite = question("\tCapacité : ");
+            console.log(findAvailableRooms(scheduleAll, heure2, capacite));
+            break;
+            
+    MenuPrincipal();
+        }
 }
 
 
