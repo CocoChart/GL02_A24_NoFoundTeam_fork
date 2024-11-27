@@ -2,7 +2,6 @@ const { parseFile } = require('./parser');
 const fs = require('fs');
 
 
-
 function parseAllFiles(folderPath) {
     const allCourses = [];
     const files = fs.readdirSync(folderPath);
@@ -15,7 +14,6 @@ function parseAllFiles(folderPath) {
 
     return allCourses;
 }
-
 const scheduleAll = parseAllFiles('./SujetA_data');
 
 //console.log(scheduleAll);
@@ -162,6 +160,13 @@ function geRoomsByCapcity(schedule) {
 // Affichage des salles triées
 //console.log(sortedRooms);
 
-// 6. Visualiser le taux d'occupation des salles 
+// Lila 6. Visualiser le taux d'occupation des salles 
+
+
+
+
+
+
+
 // 7. Générer un fichier iCalendar entre deux dates données pour des cours sélectionnés 
 
