@@ -1,22 +1,25 @@
 const { parseFile } = require('./parser');
 const fs = require('fs');
 
-const scheduleAB = parseFile('./SujetA_data/AB/edt.cru');
-console.log(scheduleAB);
 
 
-function parseAllFiles() {
-    const scheduleAll = {};
-    const files = fs.readdirSync('./SujetA_data');
+function parseAllFiles(folderPath) {
+    const allCourses = [];
+    const files = fs.readdirSync(folderPath);
+    
     files.forEach(file => {
-        const schedule = parseFile(`./SujetA_data/${file}/edt.cru`);
-        scheduleAll[file] = schedule;
+        const courses = parseFile(`./SujetA_data/${file}/edt.cru`);
+        allCourses.push(...courses);
+    
     });
-    return scheduleAll;
+
+    return allCourses;
 }
 
-const scheduleAll = parseAllFiles();
-console.log(scheduleAll);
+const scheduleAll = parseAllFiles('./SujetA_data');
+
+//console.log(scheduleAll);
+
 
 
 //Fonctionnalités à implémenter
@@ -32,22 +35,72 @@ console.log(scheduleAll);
 
 // 1. Vérifier l'occupation d'une salle et  Trouver les salles disponibles pour un créneau donné avec les capacités
 function isRoomOccupied(schedule, room, time) {
-    const courses = Object.values(schedule).flat();
-    return courses.some(course => course.room === room && course.time === time);
+    const courses = Object.values(schedule);
+    for (let course of courses) {
+        if (course.room === room && course.time === time) {
+            return true;
+        }
+    }
+    return false;
 }
 
 function getRoomCapacity(schedule, room) {
-    const courses = Object.values(schedule).flat();
-    return Math.max(...courses.filter(course => course.room === room).map(course => course.capacity));
+    const courses = Object.values(schedule); 
+    let maxCapacity = 0;
+    for (let course of courses) {
+        if (course.room === room && course.capacity > maxCapacity) {
+            maxCapacity = course.capacity;
+        }
+    }
+    return maxCapacity;
 }
 
 function findAvailableRooms(schedule, time, capacity) {
-    const courses = Object.values(schedule).flat();
-    const rooms = [...new Set(courses.map(course => course.room))];
-    return rooms.filter(room => !isRoomOccupied(schedule, room, time) && getRoomCapacity(schedule, room) >= capacity);
+    const listRooms = [];
+    const availableRooms = [];
+    const courses = Object.values(schedule);
+
+    for (const course of courses) {
+        if (!listRooms.includes(course.room)) {
+            console.log(course.room);
+            listRooms.push(course.room);
+        }  
+    }
+
+    for (const room of listRooms) {
+        const roomOccupied = isRoomOccupied(schedule, room, time);
+        const roomCapacity = getRoomCapacity(schedule, room);
+
+        if (!roomOccupied && roomCapacity >= capacity) {
+            availableRooms.push(room);
+        }
+    }
+
+    return availableRooms;
 }
 
-console.log(findAvailableRooms(scheduleAB, 'J 10:00-12:00', 20));
+//console.log(findAvailableRooms(scheduleAB, 'J 10:00-12:00', 20));
+console.log(isRoomOccupied(scheduleAll, 'P101', 'ME 10:00-12:00')); 
+console.log(getRoomCapacity(scheduleAll, 'B103'));
+console.log(findAvailableRooms(scheduleAll, 'ME 10:00-12:00', 30));
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // Aurélien 2. Accèder aux créneaux disponibles d'une salle donnée avec la capacité max de la salle
 
@@ -74,10 +127,10 @@ function findCourseSchedule(schedule, courseName) {
 }
 
 // Appel de la fonction
-const sortedResult = findCourseSchedule(schedule, courseName);
+//const sortedResult = findCourseSchedule(schedule, courseName);
 
 // Affichage des des salles et créneaux horaires d'un cours
-console.log(sortedResult);
+//console.log(sortedResult);
 
 // 4. Trouver la capacité maximale d'une salle donnée (Etape utilisée en 1)
 // 5. Classer les salles par capacité d'accueil max 
@@ -104,10 +157,10 @@ function geRoomsByCapcity(schedule) {
 }
 
 // Appel de la fonction
-const sortedRooms = getRoomsByCapacity(schedule);
+//const sortedRooms = getRoomsByCapacity(schedule);
 
 // Affichage des salles triées
-console.log(sortedRooms);
+//console.log(sortedRooms);
 
 // 6. Visualiser le taux d'occupation des salles 
 // 7. Générer un fichier iCalendar entre deux dates données pour des cours sélectionnés 
