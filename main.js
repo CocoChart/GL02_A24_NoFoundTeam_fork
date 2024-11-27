@@ -203,4 +203,127 @@ function test() {
 
 }
 
-test();
+
+const question = require('prompt-sync')({sigint: true});
+
+
+function MenuPrincipal() {
+    console.log("\n=== Menu Principal ===");
+    console.log("1. Afficher les créneaux disponibles d'une salle donnée");
+    console.log("2. Afficher si une salle est occupée à un créneau donné");
+    console.log("3. Afficher les salles et créneaux horaires d'un cours donné");
+    console.log("4. Afficher les salles disponibles à un créneau donné");
+    console.log("5. Afficher les salles triées par capacité");
+    console.log("6. Visualiser le taux d'occupation des salles");
+    console.log("7. Générer un fichier iCalendar");
+    console.log("8. Afficher la capacité maximale d'une salle donnée");
+    console.log("\n9. Quitter");
+    console.log("=======================");
+
+    let option = question("Choisissez une option: ");
+    switch (option.trim()) {
+        case "1":
+            let salle = question("\tSalle : ");
+            console.log(salle);
+            break;
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+const readline = require('readline');
+// Création de l'interface readline pour lire les entrées utilisateur
+const rl1 = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+  });
+
+function MenuPrincipal() {
+    console.log("\n=== Menu Principal ===");
+    console.log("1. Afficher les crénaux disponibles d'une salle donnée");
+    console.log("2. Afficher si une salle est occupée à un créneau donné");
+    console.log("3. Afficher les salles et créneaux horaires d'un cours donné");
+    console.log("4. Afficher les salles disponibles à un créneau donné");
+    console.log("5. Afficher les salles triées par capacité");
+    console.log("6. Visualiser le taux d'occupation des salles");
+    console.log("7. Générer un fichier iCalendar");
+    console.log("8. Afficher la capacité maximale d'une salle donnée");
+    console.log("\n9. Quitter");
+    console.log("=======================");
+
+    rl1.question("Choisissez une option: ", (option) => {
+        switch (option.trim()) {
+          case "1": 
+            console.log("\n");
+          case "2":
+            console.log("\n");
+            let salle = DemanderSalle();
+            console.log(salle);
+          case "3":
+            console.log("Afficher les salles et créneaux horaires d'un cours donné");
+            break;
+          case "4":
+            console.log("Afficher les salles disponibles à un créneau donné");
+            break;
+          case "5":
+            console.log("Afficher les salles triées par capacité");
+            break;
+          case "6":
+            console.log("Visualiser le taux d'occupation des salles");
+            break;
+          case "7":
+            console.log("Générer un fichier iCalendar");
+            break;
+          case "8":
+            console.log("Afficher la capacité maximale d'une salle donnée");
+            break;
+          case "9":
+            console.log("Quitter");
+            rl.close();
+            return; // Terminer la fonction pour éviter de relancer le menu
+          default:
+            console.log("Option invalide. Veuillez choisir une option valide.");
+        }
+        MenuPrincipal(); // Relancer le menu après un choix
+    });
+    
+
+}
+
+function DemanderSalle() {
+    rl1.question("\t Salle : ", (salle) => {
+        return salle;
+    });
+}
+
+
+
+
+
+
+
+MenuPrincipal();
+
+//test();
