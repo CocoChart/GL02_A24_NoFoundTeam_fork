@@ -88,7 +88,17 @@ function findAvailableRooms(schedule, time, capacity) {
 
 // Aurélien 2. Accèder aux créneaux disponibles d'une salle donnée avec la capacité max de la salle
 
+function findAvailableSlots(schedule, salle) {
+    const creneaux = [];
+    const courses = Object.values(schedule);
 
+    for (const course of courses) {
+        if (course.room === salle) {
+            creneaux.push(course.time);
+        }
+    }
+    return creneaux.sort();
+}
 
 // Maé 3. Rechercher les salles et les créneaux horaires d'un cours donné 
 
@@ -228,7 +238,11 @@ function MenuPrincipal() {
     switch (option.trim()) {
         case "1":
             let salle1 = question("\tSalle (ex : P101): ");
-            console.log("????");
+            let capacity = getRoomCapacity(scheduleAll, salle1);
+            console.log("La salle "+salle1+" ("+capacity+" places) est disponibles aux crénaux:", yellow);
+            for (let crenau of findAvailableSlots(scheduleAll, salle1)) {
+                console.log("\t- "+crenau);
+            }
             break;
         case "2":
             let salle2 = question("\tSalle (ex : P101): ");
