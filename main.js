@@ -1,3 +1,4 @@
+const { yellow, red, green } = require('colors');
 const { parseFile } = require('./parser');
 const fs = require('fs');
 
@@ -86,6 +87,8 @@ function findAvailableRooms(schedule, time, capacity) {
 
 
 // Aurélien 2. Accèder aux créneaux disponibles d'une salle donnée avec la capacité max de la salle
+
+
 
 // Maé 3. Rechercher les salles et les créneaux horaires d'un cours donné 
 
@@ -213,7 +216,7 @@ function MenuPrincipal() {
     console.log("1. Afficher les créneaux disponibles d'une salle donnée");
     console.log("2. Afficher si une salle est occupée à un créneau donné");
     console.log("3. Afficher les salles et créneaux horaires d'un cours donné");
-    console.log("4. Afficher les salles disponibles à un créneau et une capacité donnés");
+    console.log("4. Afficher les salles disponibles à un créneau et une capacité donnés");//Important d'avoir la capacité ?
     console.log("5. Afficher les salles triées par capacité");
     console.log("6. Visualiser le taux d'occupation des salles");
     console.log("7. Générer un fichier iCalendar");
@@ -231,20 +234,28 @@ function MenuPrincipal() {
             let salle2 = question("\tSalle (ex : P101): ");
             let heure = question("\tHoraire (ex : ME 10:00-12:00) : ");
                 if (isRoomOccupied(scheduleAll, salle2, heure)) {
-                    console.log(`La salle ${salle2} est occupée à ${heure}`);
+                    console.log(`La salle ${salle2} est occupée à ${heure}`,red);
                     console.log("RECHERCHER QUEL COURS OCCUPE")
                 } else {
-                    console.log(`La salle ${salle2} est libre à ${heure}`);
+                    console.log(`La salle ${salle2} est libre à ${heure}`,green);
                 }
             
             break;
         case "3":
             let cours = question("\tNom du cours (ex : AP03): ");
-            break;
+            console.log(findCourseSchedule(scheduleAll, cours));//Pas fonctionnel
+            break; 
         case "4":
             let heure2 = question("\tHoraire (ex : ME 10:00-12:00) : ");
             let capacite = question("\tCapacité : ");
             console.log(findAvailableRooms(scheduleAll, heure2, capacite));
+            break;
+        case "5":
+            console.log(geRoomsByCapcity(scheduleAll));// Pas fonctionnel
+            break;
+        case "8":
+            let salle3 = question("\tSalle (ex : P101): ");
+            console.log("La salle "+salle3+" a une capacité de "+getRoomCapacity(scheduleAll, salle3)+" places.", yellow);
             break;
             
     MenuPrincipal();
