@@ -36,6 +36,7 @@ function parseAllFiles(folderPath) {
 //relier au menu 
 //faire fonction qui récupere la path du dossier data 
 // fonctionnalité rapport conflits de données 
+// test unitaires
 
 
 
