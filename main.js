@@ -222,7 +222,7 @@ const question = require('prompt-sync')({sigint: true});
 
 function MenuPrincipal() {
     const scheduleAll = parseAllFiles('./SujetA_data');
-    console.log("\n=== Menu Principal ===");
+    console.log("\n=== Menu Principal ===".yellow);
     console.log("1. Afficher les créneaux disponibles d'une salle donnée");
     console.log("2. Afficher si une salle est occupée à un créneau donné");
     console.log("3. Afficher les salles et créneaux horaires d'un cours donné");
@@ -232,26 +232,26 @@ function MenuPrincipal() {
     console.log("7. Générer un fichier iCalendar");
     console.log("8. Afficher la capacité maximale d'une salle donnée");
     console.log("\n9. Quitter");
-    console.log("=======================");
+    console.log("=======================".yellow);
 
     let option = question("Choisissez une option: ");
     switch (option.trim()) {
         case "1":
             let salle1 = question("\tSalle (ex : P101): ");
             let capacity = getRoomCapacity(scheduleAll, salle1);
-            console.log("La salle "+salle1+" ("+capacity+" places) est disponibles aux crénaux:", yellow);
+            console.log("La salle ".cyan+salle1.cyan+" (".cyan+ capacity.toString().cyan +" places) est disponibles aux crénaux:".cyan);
             for (let crenau of findAvailableSlots(scheduleAll, salle1)) {
-                console.log("\t- "+crenau);
+                console.log("\t- ".cyan+crenau.cyan);
             }
             break;
         case "2":
             let salle2 = question("\tSalle (ex : P101): ");
             let heure = question("\tHoraire (ex : ME 10:00-12:00) : ");
                 if (isRoomOccupied(scheduleAll, salle2, heure)) {
-                    console.log(`La salle ${salle2} est occupée à ${heure}`,red);
+                    console.log(`La salle ${salle2} est occupée à ${heure}`.red);
                     console.log("RECHERCHER QUEL COURS OCCUPE")
                 } else {
-                    console.log(`La salle ${salle2} est libre à ${heure}`,green);
+                    console.log(`La salle ${salle2} est libre à ${heure}`.green);
                 }
             
             break;
@@ -262,7 +262,11 @@ function MenuPrincipal() {
         case "4":
             let heure2 = question("\tHoraire (ex : ME 10:00-12:00) : ");
             let capacite = question("\tCapacité : ");
-            console.log(findAvailableRooms(scheduleAll, heure2, capacite));
+
+            console.log(`Voici les salles de ${capacite} places disponibles à ${heure2}`.cyan);
+            for (let salle of findAvailableRooms(scheduleAll, heure2, capacite)) {
+                //console.log("\t- ".cyan+salle.cyan);
+            }
             break;
         case "5":
             console.log(geRoomsByCapcity(scheduleAll));// Pas fonctionnel
