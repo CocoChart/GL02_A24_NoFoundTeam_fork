@@ -32,6 +32,9 @@ function parseAllFiles(folderPath) {
 // Lila 6. Visualiser le taux d'occupation des salles 
 // 7. Générer un fichier iCalendar entre deux dates données pour des cours sélectionnés 
 
+//relier au menu 
+//faire fonction qui récupere la path du dossier data 
+// fonctionnalité rapport conflits de données 
 
 
 
@@ -94,16 +97,16 @@ function findCourseSchedule(schedule, courseName) {
     const result = [];
 
     // Parcours de tous les cours dans le planning
-    Object.values(schedule).forEach(courseList => {
-        courseList.forEach(course => {
+    Object.values(schedule).forEach(course => {
+        //courseList.forEach(course => {
             // Si le nom du cours correspond à celui recherché
-            if (courseName.toLowerCase() === course.toLowerCase()) {
+            if (courseName.toLowerCase() === course.courseId.toLowerCase()) {
                 result.push({
                     room: course.room,
                     time: course.time
                 });
             }
-        });
+        //});
     });
 
     return result;
@@ -124,14 +127,14 @@ function geRoomsByCapcity(schedule) {
     const rooms = [];
 
     // Parcours de tous les cours dans le planning
-    Object.values(schedule).forEach(courseList => {
-        courseList.forEach(course => {
+    Object.values(schedule).forEach(course=> {
+        //courseList.forEach(course => {
             // Ajouter la salle avec sa capacité au tableau rooms
                 rooms.push({
                     room: course.room,
                     capacity: course.capacity
                 });
-        });
+        //});
     });
 
     // Trier les salles par capacité (du plus grand au plus petit)
