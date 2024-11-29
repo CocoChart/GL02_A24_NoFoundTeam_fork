@@ -265,7 +265,7 @@ function MenuPrincipal() {
 
             console.log(`Voici les salles de ${capacite} places disponibles à ${heure2}`.cyan);
             for (let salle of findAvailableRooms(scheduleAll, heure2, capacite)) {
-                //console.log("\t- ".cyan+salle.cyan);
+                console.log("\t- ".cyan+salle.cyan);
             }
             break;
         case "5":
