@@ -266,6 +266,10 @@ function MenuPrincipal() {
 
     let option = question(couleurQuestion("Choisissez une option: "));
     switch (option.trim()) {
+        default:
+            console.log(couleurRouge("Veuillez choisir une option valide"));
+            break;
+
         case "1":
             let salle1 = question(couleurQuestion("\tSalle (ex : P101): "));
             let capacity = getRoomCapacity(scheduleAll, salle1);
@@ -313,8 +317,18 @@ function MenuPrincipal() {
             console.log(couleurReponse("La salle "+salle3+" a une capacité maximale de "+getRoomCapacity(scheduleAll, salle3)+" places."));
             break;
             
+        case "9":
+            console.log(couleurReponse("Au revoir !"));
+            break;     
         }
-    MenuPrincipal();
+
+    if (option.trim() != "9") {        
+        let option2 = question(couleurQuestion("\n\nRetourner au menu principal ? (y/n) "));
+        if (option2.trim().toLowerCase() === "y") {
+            console.log("\n\n\n\n\n\n\n\n\n\n")
+            MenuPrincipal();
+        }
+    }
 }
 
 
