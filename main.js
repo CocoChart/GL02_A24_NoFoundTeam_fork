@@ -69,7 +69,7 @@ function findAvailableRooms(schedule, time, capacity) {
 
     for (const course of courses) {
         if (!listRooms.includes(course.room)) {
-            console.log(course.room);
+            //console.log(course.room);
             listRooms.push(course.room);
         }  
     }
@@ -102,6 +102,18 @@ function findAvailableSlots(schedule, salle) {
         }
     }
     return creneaux.sort();
+}
+
+
+function getCoursesByRoomAndSlot(schedule, salle,crenau) {
+    const courses = Object.values(schedule);
+    const coursesList = [];
+
+    for (const course of courses) {
+        if (course.room === salle && course.time === crenau) {
+            return course.courseId;
+        }
+    }
 }
 
 // Maé 3. Rechercher les salles et les créneaux horaires d'un cours donné 
@@ -139,15 +151,22 @@ function findCourseSchedule(schedule, courseName) {
 //Fonction qui classe les salles en fonction de leur capacité d'accueil
 function geRoomsByCapcity(schedule) {
     const rooms = [];
+    const roomsNames=[]; //Contient le nom des salles déja ajoutées au tableau rooms
 
     // Parcours de tous les cours dans le planning
     Object.values(schedule).forEach(course=> {
         //courseList.forEach(course => {
-            // Ajouter la salle avec sa capacité au tableau rooms
+
+            //Si la salle n'a pas été traitées
+            if (!roomsNames.includes(course.room)){
+                // Ajouter la salle avec sa capacité au tableau rooms
                 rooms.push({
                     room: course.room,
-                    capacity: course.capacity
+                    capacity: getRoomCapacity(schedule, course.room)
                 });
+                // Ajouter la salle dans la liste de celles déja traitées
+                roomsNames.push(course.room);
+            }
         //});
     });
 
@@ -222,66 +241,80 @@ function test() {
 
 
 const question = require('prompt-sync')({sigint: true});
+const chalk = require('chalk');//Permet de gerer les couleurs du texte
 
+const couleurTitre= chalk.hex('#BCA12D');
+const couleurTexteMenu= chalk.hex('#edfbc1');
+const couleurQuestion= chalk.hex('#858031');
+const couleurReponse= chalk.hex('#d9d375');
+const couleurRouge= chalk.hex('#ff0000');
+const couleurVert= chalk.hex('#00ff00');
 
 function MenuPrincipal() {
     const scheduleAll = parseAllFiles('./SujetA_data');
-    console.log("\n=== Menu Principal ===".yellow);
-    console.log("1. Afficher les créneaux disponibles d'une salle donnée");
-    console.log("2. Afficher si une salle est occupée à un créneau donné");
-    console.log("3. Afficher les salles et créneaux horaires d'un cours donné");
-    console.log("4. Afficher les salles disponibles à un créneau et une capacité donnés");//Important d'avoir la capacité ?
-    console.log("5. Afficher les salles triées par capacité");
-    console.log("6. Visualiser le taux d'occupation des salles");
-    console.log("7. Générer un fichier iCalendar");
-    console.log("8. Afficher la capacité maximale d'une salle donnée");
+    console.log(couleurTitre("\n=== Menu Principal ==="));
+    console.log(couleurTexteMenu("1. Afficher les créneaux disponibles d'une salle donnée"));
+    console.log(couleurTexteMenu("2. Afficher si une salle est occupée à un créneau donné"));
+    console.log(couleurTexteMenu("3. Afficher les salles et créneaux horaires d'un cours donné"));
+    console.log(couleurTexteMenu("4. Afficher les salles disponibles à un créneau et une capacité donnés"));//Important d'avoir la capacité ?
+    console.log(couleurTexteMenu("5. Afficher les salles triées par capacité"));
+    console.log(couleurTexteMenu("6. Visualiser le taux d'occupation des salles"));
+    console.log(couleurTexteMenu("7. Générer un fichier iCalendar"));
+    console.log(couleurTexteMenu("8. Afficher la capacité maximale d'une salle donnée"));
     console.log("\n9. Quitter");
-    console.log("=======================".yellow);
+    console.log(couleurTitre("======================="));
 
-    let option = question("Choisissez une option: ");
+    let option = question(couleurQuestion("Choisissez une option: "));
     switch (option.trim()) {
         case "1":
-            let salle1 = question("\tSalle (ex : P101): ");
+            let salle1 = question(couleurQuestion("\tSalle (ex : P101): "));
             let capacity = getRoomCapacity(scheduleAll, salle1);
-            console.log("La salle ".cyan+salle1.cyan+" (".cyan+ capacity.toString().cyan +" places) est disponibles aux crénaux:".cyan);
+            console.log(couleurReponse("La salle "+salle1+" ("+ capacity.toString() +" places) est disponibles aux crénaux:"));
             for (let crenau of findAvailableSlots(scheduleAll, salle1)) {
-                console.log("\t- ".cyan+crenau.cyan);
+                console.log(couleurReponse("\t- "+crenau));
             }
             break;
         case "2":
-            let salle2 = question("\tSalle (ex : P101): ");
-            let heure = question("\tHoraire (ex : ME 10:00-12:00) : ");
+            let salle2 = question(couleurQuestion("\tSalle (ex : P101): "));
+            let heure = question(couleurQuestion("\tHoraire (ex : ME 10:00-12:00) : "));
                 if (isRoomOccupied(scheduleAll, salle2, heure)) {
-                    console.log(`La salle ${salle2} est occupée à ${heure}`.red);
-                    console.log("RECHERCHER QUEL COURS OCCUPE")
+                    console.log(couleurRouge(`La salle ${salle2} est occupée à ${heure}`+" par le cours "+getCoursesByRoomAndSlot(scheduleAll, salle2, heure)));
                 } else {
-                    console.log(`La salle ${salle2} est libre à ${heure}`.green);
+                    console.log(couleurVert(`La salle ${salle2} est libre à ${heure}`));
                 }
             
             break;
         case "3":
-            let cours = question("\tNom du cours (ex : AP03): ");
-            console.log(findCourseSchedule(scheduleAll, cours));//Pas fonctionnel
+            let cours = question(couleurQuestion("\tNom du cours (ex : AP03): "));
+            console.log(couleurReponse(`Voici les crénaux et salles de cours de l'UE ${cours}`));
+            for (let creneau of findCourseSchedule(scheduleAll, cours)) {
+                console.log(couleurReponse(`\t- Crénaux : ${creneau.time} ; Salle : ${creneau.room}`));
+            }
             break; 
         case "4":
-            let heure2 = question("\tHoraire (ex : ME 10:00-12:00) : ");
-            let capacite = question("\tCapacité : ");
+            let heure2 = question(couleurQuestion("\tHoraire (ex : ME 10:00-12:00) : "));
+            let capacite = question(couleurQuestion("\tCapacité : "));
 
-            console.log(`Voici les salles de ${capacite} places disponibles à ${heure2}`.cyan);
+            console.log(couleurReponse(`Voici les salles de ${capacite} places disponibles à ${heure2}`));
             for (let salle of findAvailableRooms(scheduleAll, heure2, capacite)) {
-                console.log("\t- ".cyan+salle.cyan);
+                if (salle !== ""){
+                    console.log(couleurReponse("\t- "+salle));
+                }        
             }
             break;
         case "5":
-            console.log(geRoomsByCapcity(scheduleAll));// Pas fonctionnel
+            console.log(couleurReponse(`Voici les salles triées en fonction de leur capacité`));
+            for (let salle of geRoomsByCapcity(scheduleAll)) {
+                    console.log(couleurReponse("\t- Salle : "+salle.room+" ; Capacité : "+salle.capacity));      
+            }
             break;
         case "8":
-            let salle3 = question("\tSalle (ex : P101): ");
-            console.log("La salle "+salle3+" a une capacité de "+getRoomCapacity(scheduleAll, salle3)+" places.", yellow);
+            let salle3 = question(couleurQuestion("\tSalle (ex : P101): "));
+            console.log(couleurReponse("La salle "+salle3+" a une capacité maximale de "+getRoomCapacity(scheduleAll, salle3)+" places."));
             break;
             
-    MenuPrincipal();
         }
+    MenuPrincipal();
 }
 
 
