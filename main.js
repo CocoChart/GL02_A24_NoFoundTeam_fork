@@ -124,7 +124,6 @@ function findCourseSchedule(schedule, courseName) {
 
     // Parcours de tous les cours dans le planning
     Object.values(schedule).forEach(course => {
-        //courseList.forEach(course => {
             // Si le nom du cours correspond à celui recherché
             if (courseName.toLowerCase() === course.courseId.toLowerCase()) {
                 result.push({
@@ -332,6 +331,6 @@ function MenuPrincipal() {
 }
 
 
-MenuPrincipal();
+//MenuPrincipal();
 
-//test();
+test();
