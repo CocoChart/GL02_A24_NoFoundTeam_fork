@@ -311,6 +311,11 @@ function MenuPrincipal() {
                     console.log(couleurReponse("\t- Salle : "+salle.room+" ; Capacité : "+salle.capacity));      
             }
             break;
+        case "7":
+            let DateDebut = question(couleurQuestion("\tVeuilez indiquer la date de début YYMMDD (ex : 241223) : "));
+            let DateFin = question(couleurQuestion("\tVeuilez indiquer la date de fin YYMMDD (ex : 241230) : "));
+            let Courses = question(couleurQuestion("\tQuels cours voulez vous examiner ? (ex : AP03 MT01 GL02) : "));
+            break;
         case "8":
             let salle3 = question(couleurQuestion("\tSalle (ex : P101): "));
             console.log(couleurReponse("La salle "+salle3+" a une capacité maximale de "+getRoomCapacity(scheduleAll, salle3)+" places."));
@@ -331,6 +336,6 @@ function MenuPrincipal() {
 }
 
 
-//MenuPrincipal();
+MenuPrincipal();
 
-test();
+//test();
