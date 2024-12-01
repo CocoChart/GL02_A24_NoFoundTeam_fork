@@ -346,6 +346,10 @@ function MenuPrincipal() {
 }
 
 
+//Choix du path du dossier data
+//const folderPath = question("Veuillez entrer le chemin du dossier data : ");
+//const scheduleAll = parseAllFiles(folderPath);
+
 MenuPrincipal();
 
 //test();
