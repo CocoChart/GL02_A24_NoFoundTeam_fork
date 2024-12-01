@@ -251,17 +251,20 @@ const couleurVert= chalk.hex('#00ff00');
 
 function MenuPrincipal() {
     const scheduleAll = parseAllFiles('./SujetA_data');
-    console.log(couleurTitre("\n=== Menu Principal ==="));
-    console.log(couleurTexteMenu("1. Afficher les créneaux disponibles d'une salle donnée"));
-    console.log(couleurTexteMenu("2. Afficher si une salle est occupée à un créneau donné"));
-    console.log(couleurTexteMenu("3. Afficher les salles et créneaux horaires d'un cours donné"));
-    console.log(couleurTexteMenu("4. Afficher les salles disponibles à un créneau et une capacité donnés"));//Important d'avoir la capacité ?
-    console.log(couleurTexteMenu("5. Afficher les salles triées par capacité"));
-    console.log(couleurTexteMenu("6. Visualiser le taux d'occupation des salles"));
-    console.log(couleurTexteMenu("7. Générer un fichier iCalendar"));
-    console.log(couleurTexteMenu("8. Afficher la capacité maximale d'une salle donnée"));
-    console.log("\n9. Quitter");
-    console.log(couleurTitre("======================="));
+
+    console.log(couleurTitre("\n╔════════════════════════════════════╗"));
+    console.log(couleurTitre("║           MENU PRINCIPAL           ║"));
+    console.log(couleurTitre("╠════════════════════════════════════╝"));
+    console.log(couleurTexteMenu("║      [1] Afficher les créneaux disponibles d'une salle donnée"));
+    console.log(couleurTexteMenu("║      [2] Afficher si une salle est occupée à un créneau donné"));
+    console.log(couleurTexteMenu("║      [3] Afficher les salles et créneaux horaires d'un cours donné"));
+    console.log(couleurTexteMenu("║      [4] Afficher les salles disponibles à un créneau et une capacité donnés"));//Important d'avoir la capacité ?
+    console.log(couleurTexteMenu("║      [5] Afficher les salles triées par capacité"));
+    console.log(couleurTexteMenu("║      [6] Visualiser le taux d'occupation des salles"));
+    console.log(couleurTexteMenu("║      [7] Générer un fichier iCalendar"));
+    console.log(couleurTexteMenu("║      [8] Afficher la capacité maximale d'une salle donnée"));
+    console.log(couleurTexteMenu("║\n║      [9] Quitter"));
+    console.log(couleurTitre("╚═══════════════════════════════════"));
 
     let option = question(couleurQuestion("Choisissez une option: "));
     switch (option.trim()) {
@@ -311,6 +314,13 @@ function MenuPrincipal() {
                     console.log(couleurReponse("\t- Salle : "+salle.room+" ; Capacité : "+salle.capacity));      
             }
             break;
+        case "6":
+            const [roomHoursOccupancy, percentageOccupancy] = getNumberOccupation(scheduleAll);
+            console.log(couleurReponse("Taux d'occupation des salles :"));
+            for (const [room, occupation] of Object.entries(roomHoursOccupancy)) {
+                console.log(couleurReponse(`\t- ${room} : ${occupation} heures soit ${percentageOccupancy[room]}%`));
+            }
+            break
         case "7":
             let DateDebut = question(couleurQuestion("\tVeuilez indiquer la date de début YYMMDD (ex : 241223) : "));
             let DateFin = question(couleurQuestion("\tVeuilez indiquer la date de fin YYMMDD (ex : 241230) : "));
