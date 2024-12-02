@@ -209,7 +209,53 @@ function getNumberOccupation(schedule) {
 
 
 // 7. Générer un fichier iCalendar entre deux dates données pour des cours sélectionnés 
+function generateICalendar(dateDebut, dateFin,courses) {
+    const jourUn = getPeriod(dateDebut, dateFin);
+}
 
+//Trouver le jour de la semaine correspondant à la date
+function getPeriod(dateStringStart, dateStringEnd) {
+    // Créer un objet Date à partir de la chaîne de date
+    const dateStart = new Date(dateStringStart);
+    // Vérifier si la date est valide
+    if (isNaN(dateStart)) {
+        throw new Error("Erreur : Date de début invalide"); // Lancer une exception
+    }
+    const dateEnd = new Date(dateStringEnd);
+    if (isNaN(dateEnd)) {
+        throw new Error("Erreur : Date de fin invalide"); // Lancer une exception
+    }
+    // console.log("Encodage date",date);
+    
+    ////// On vient compter le nombre de jours entre les deux dates.
+    const timestamp1 = dateStart.getTime();
+    console.log("getTime de date début : ", timestamp1);
+    const timestamp2 = dateEnd.getTime();
+
+    // On vérifie que timestamp1 < timestamp2
+    if (timestamp2 < timestamp1) {
+        throw new Error("Erreur : Date de début > date de fin"); // Lancer une exception
+    }
+
+    // Calculer la différence en millisecondes
+    const differenceInMilliseconds = Math.abs(timestamp2 - timestamp1);
+
+    // Convertir la différence en jours
+    const millisecondsInADay = 1000 * 60 * 60 * 24; // 1000 ms * 60 s * 60 min * 24 h
+    const differenceInDays = Math.floor(differenceInMilliseconds / millisecondsInADay);
+    console.log("Différence de jours : ", differenceInDays);
+
+    // Obtenir le jour de la semaine (0 = dimanche, 1 = lundi, ..., 6 = samedi)
+    const dayIndex = dateStart.getDay();
+    // console.log("Index du jour : ",dayIndex);
+
+    // Tableau des jours de la semaine
+    const daysOfWeek = ["Dimanche", "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"];
+    console.log("Jour de la semaine : ", daysOfWeek[dayIndex]);
+
+    // Retourner le jour de la semaine
+    return daysOfWeek[dayIndex];
+}
 
 
 // Tests
@@ -235,6 +281,16 @@ function test() {
     const [roomHoursOccupancy, percentageOccupancy] = getNumberOccupation(scheduleAll);
     console.log(roomHoursOccupancy);
     console.log(percentageOccupancy);
+
+    //test 7
+    console.log("Test icalendar");
+    let dateDebut = "2024-12-23";
+    let dateFin = "2025-01-12";
+    let courses = "AP03";
+    generateICalendar(dateDebut, dateFin, courses);
+
+
+
 
 }
 
@@ -322,9 +378,10 @@ function MenuPrincipal() {
             }
             break
         case "7":
-            let DateDebut = question(couleurQuestion("\tVeuilez indiquer la date de début YYMMDD (ex : 241223) : "));
-            let DateFin = question(couleurQuestion("\tVeuilez indiquer la date de fin YYMMDD (ex : 241230) : "));
-            let Courses = question(couleurQuestion("\tQuels cours voulez vous examiner ? (ex : AP03 MT01 GL02) : "));
+            let dateDebut = question(couleurQuestion("\tVeuilez indiquer la date de début YYYY-MM-DD (ex : 2024-12-23) : "));
+            let dateFin = question(couleurQuestion("\tVeuilez indiquer la date de fin YYYY-MM-DD (ex : 2024-12-30) : "));
+            let courses = question(couleurQuestion("\tQuels cours voulez vous examiner ? (ex : AP03 MT01 GL02) : "));
+            generateICalendar(dateDebut, dateFin, courses);
             break;
         case "8":
             let salle3 = question(couleurQuestion("\tSalle (ex : P101): "));
