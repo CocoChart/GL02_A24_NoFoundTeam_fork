@@ -131,7 +131,6 @@ function findCourseSchedule(schedule, courseName) {
                     time: course.time
                 });
             }
-        //});
     });
 
     return result;
@@ -208,12 +207,154 @@ function getNumberOccupation(schedule) {
 
 
 
-// 7. Générer un fichier iCalendar entre deux dates données pour des cours sélectionnés 
-function generateICalendar(dateDebut, dateFin,courses) {
-    const jourUn = getPeriod(dateDebut, dateFin);
+// 7. Maé. Générer un fichier iCalendar entre deux dates données pour des cours sélectionnés 
+function generateICalendar(dateDebut, dateFin,courses, scheduleAll) {
+
+    // Fonction interne, ajoute chaque event crée dans createEventsForCourses dans icsContent
+    function addEventToICS(event) {
+        const eventContent = `
+BEGIN:VEVENT
+UID:${event.uid}
+DTSTAMP:${event.dtstamp}
+DTSTART:${event.start}
+DTEND:${event.end}
+SUMMARY:${event.summary}
+LOCATION:${event.location}
+END:VEVENT
+`.trim();
+        // Ajouter l'événement au contenu iCalendar
+        icsContent += eventContent + '\n\n'; // Ajoute un saut de ligne pour séparer les événements
+    };
+
+    // On vient créer et insérer dans le calendrier des évenements à chaque occurence du cours 
+    // choisi par l'utilisateur
+    function createEventsForCourses(schedule, course, period){
+        // initialisation variables
+        let event = [];
+        let currentDate = new Date();
+        let startDate = new Date();
+        let endDate = new Date();
+        const todayDate = new Date();
+
+        // On détermine les horaires et les salles du cours en input
+        let creneau = findCourseSchedule(schedule, course);
+
+        // pour chaque créneau de cours, on cycle sur toute la longueur de la période du calendrier.
+        // Si le jour de la semaine incrémentale matche le jour ou se déroule le cours chaque semaine,
+        // on crée une structure event, contenant les information relatives à ce cours, en dates absolues 
+        // ex : Date du début de l'event = 20241205T170000Z 
+        //              Soit 20241205 pour le 05/12/2024
+        //              T pour le time ici 17:00:00
+        //              Z pour indique le fuseau horaire UTC
+        // On travaille en UTC, ça sera plus simple pour la portabilité du fichier.
+
+        for (const i of creneau){
+            // console.log("i =", i);
+           const eventInfo = parseSchedule(i.time); 
+           // On parse (regex) la string time d'un cours pour récupérer les infos dans une structure eventInfo
+           let dayCode = period.dayIndex;
+
+           // pour toute la longueur de la période spécifiée par l'utilisateur on cycle
+           for (let j = 0; j < period.differenceInDays; j++){
+            currentDate = addDaysToUTCDate(period.dateStart, j); // On cycle la date en la mettant à jour avec dateDebut + j eme jour.
+            // console.log("current date : ", currentDate);
+
+            // Le daycode indique le jour de la semaine (dim = 0, lun = 1 etc), il change en même temps qu'on ajoute les jours ci-dessus.
+            // Si on arrive à un jour de la semaine qui correspond à un jour de cours on crée un event avec la date et l'heure.
+            if (dayCode == eventInfo.dayCode){
+                startDate = setLocalTimeToUTCDate(currentDate, eventInfo.startTime);
+                endDate = setLocalTimeToUTCDate(currentDate, eventInfo.endTime);
+                
+                event = {
+                    uid: course, // Nom du cours, à modifier pour un uid random ?
+                    dtstamp: todayDate.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z",
+                    start: startDate.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z", //on formatte la date pour ics
+                    end: endDate.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z",
+                    summary: "Cours", // summary arbitraire à changer
+                    location: i.room, // La salle de cours
+                };
+                
+                // On ajoute l'event à icsContent qui servira à générer un fichier ics
+                addEventToICS(event);
+            }
+            // On incrémente dayCode
+            if (dayCode == 6){
+                dayCode = 0;
+            }
+            else {
+                dayCode = dayCode + 1;
+            }
+            
+           }
+        }
+        
+        // Formatte les données de schedule du cours donné.
+        function parseSchedule(courseTime) {
+            // Regex pour extraire le jour et les heures de la string course.time
+            const regex = /([LMAEJVSD])\s+(\d{1,2}:\d{2})-(\d{1,2}:\d{2})/;
+            const match = courseTime.match(regex);
+        
+            if (!match) {
+                throw new Error("Format de chaîne invalide");
+            }
+        
+            const dayLetter = match[1]; // Lettre du jour
+            const startTime = match[2]; // Heure de début
+            const endTime = match[3]; // Heure de fin
+        
+            // Mapping des jours de la semaine (dimanche = 0)
+            const daysMap = {
+                D: 0, // Dimanche
+                L: 1, // Lundi
+                M: 2, // Mardi
+                M: 3, // Mercredi
+                J: 4, // Jeudi
+                V: 5, // Vendredi
+                S: 6  // Samedi
+            };
+        
+            // Obtenir le jour codé
+            const dayCode = daysMap[dayLetter];
+      
+            return {
+                dayCode,
+                startTime,
+                endTime
+            };
+        }
+
+    };
+
+
+    ///////////// Début de la fonction generateICalendar() ////////////////////
+
+    // Variable pour stocker le contenu iCalendar
+    let icsContent = `BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+
+`;
+    // On détermine la période demandée par l'utilisateur
+    let period = getPeriod(dateDebut, dateFin);
+    // On extrait les cours indiqués par l'utilisateur
+    coursesStruct = extractCourses(courses);
+
+    // Pour chaque cours on lance la génération des différent event dans la période donnée
+    for (let course of coursesStruct){
+        createEventsForCourses(scheduleAll, course, period);
+    };
+
+    icsContent += `END:VCALENDAR`; //finalisation du vcalendar
+
+//     console.log(`ICS CONTENT : 
+// ${icsContent}`);
+
+    const fileName = dateDebut + " " + dateFin + " " + courses + ".ics" ;
+    // On sauvegarde le fichier au format ICS
+    saveICSFile(icsContent, fileName);
 }
 
-//Trouver le jour de la semaine correspondant à la date
+//Trouver le jour de la semaine correspondant à la date et return une structure avec les infos importantes
 function getPeriod(dateStringStart, dateStringEnd) {
     // Créer un objet Date à partir de la chaîne de date
     const dateStart = new Date(dateStringStart);
@@ -225,11 +366,9 @@ function getPeriod(dateStringStart, dateStringEnd) {
     if (isNaN(dateEnd)) {
         throw new Error("Erreur : Date de fin invalide"); // Lancer une exception
     }
-    // console.log("Encodage date",date);
     
-    ////// On vient compter le nombre de jours entre les deux dates.
+    ////// On vient compter le nombre de jours entre les deux dates
     const timestamp1 = dateStart.getTime();
-    console.log("getTime de date début : ", timestamp1);
     const timestamp2 = dateEnd.getTime();
 
     // On vérifie que timestamp1 < timestamp2
@@ -243,18 +382,94 @@ function getPeriod(dateStringStart, dateStringEnd) {
     // Convertir la différence en jours
     const millisecondsInADay = 1000 * 60 * 60 * 24; // 1000 ms * 60 s * 60 min * 24 h
     const differenceInDays = Math.floor(differenceInMilliseconds / millisecondsInADay);
-    console.log("Différence de jours : ", differenceInDays);
 
-    // Obtenir le jour de la semaine (0 = dimanche, 1 = lundi, ..., 6 = samedi)
+
+    // Obtenir le jour de la semaine (0 = dimanche, 1 = lundi, ..., 6 = samedi) 
+    // conditionnne tout le reste de l'algo (comparaisons dans createEventsForCourses)
     const dayIndex = dateStart.getDay();
-    // console.log("Index du jour : ",dayIndex);
 
     // Tableau des jours de la semaine
     const daysOfWeek = ["Dimanche", "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"];
-    console.log("Jour de la semaine : ", daysOfWeek[dayIndex]);
+
+    period = {
+        dateStart,
+        dateEnd,
+        dayIndex,
+        weekDayStart : daysOfWeek[dayIndex],
+        differenceInDays
+    }
 
     // Retourner le jour de la semaine
-    return daysOfWeek[dayIndex];
+    return period;
+};
+
+// Sert à extraire les cours d'une string en contenant plusieurs
+function extractCourses(input) {
+    // Supprimer les espaces supplémentaires et diviser la chaîne par des espaces, des virgules ou des points-virgules
+    const codes = input.trim().split(/[\s,;]+/);
+
+    // Utiliser un Set pour éliminer les doublons
+    const codesUniques = new Set(codes);
+
+    // Vérifier s'il y a des doublons
+    if (codes.length !== codesUniques.size) {
+        console.warn("Attention : des codes en double ont été trouvés !");
+    }
+
+    // Retourner un tableau des codes uniques
+    return Array.from(codesUniques);
+}
+
+/**
+ * Ajoute un horaire (dans le fuseau horaire local) à une date et convertie le tout en format UTC 
+ * en fonction de la localisation de l'utilisateur.
+ *
+ * @param {string} dateUTC - La date d'origine en UTC (ISO 8601).
+ * @param {string} localTime - L'heure à appliquer (format "HH:mm" en heure locale).
+ * @returns {Date} - La nouvelle date en UTC sous forme d'objet Date.
+ */
+function setLocalTimeToUTCDate(dateUTC, localTime) {
+    const [hours, minutes] = localTime.split(':').map(Number); // Extraire heures et minutes
+    const date = new Date(dateUTC); // Créer un objet Date à partir de la date UTC
+
+    // Obtenir le décalage local en minutes (positif à l'ouest, négatif à l'est de UTC)
+    const timezoneOffsetMinutes = date.getTimezoneOffset();
+
+    // Calcul de l'heure en UTC
+    const utcHours = hours - timezoneOffsetMinutes / 60;
+    const utcMinutes = minutes - (timezoneOffsetMinutes % 60);
+
+    // Appliquer l'heure UTC à la date
+    date.setUTCHours(utcHours, utcMinutes, 0, 0); // Pas de secondes ni millisecondes
+
+    // Retourner l'objet Date modifié
+    return date;
+};
+
+
+/**
+ * Ajoute un nombre de jours à une date UTC.
+ *
+ * @param {string} dateUTC - La date d'origine en UTC (ISO 8601).
+ * @param {number} daysToAdd - Le nombre de jours à ajouter (peut être négatif).
+ * @returns {string} - La nouvelle date en UTC au format ISO 8601.
+ */
+function addDaysToUTCDate(dateUTC, daysToAdd) {
+    const date = new Date(dateUTC); // Convertir la chaîne UTC en objet Date
+
+    // Ajouter les jours en millisecondes
+    date.setUTCDate(date.getUTCDate() + daysToAdd);
+
+    // Retourner la date au format ISO 8601
+    // return date.toISOString();
+    return date;
+};
+
+// Fonction pour sauvegarder un fichier .ics à partir d'un contenu donné
+function saveICSFile(icsContent, filename = 'test.ics') {
+    // Crée un fichier avec le contenu ICS dans le répertoire courant
+    fs.writeFileSync(filename, icsContent, 'utf8');
+    console.log(`Fichier ${filename} sauvegardé !`);
 }
 
 
@@ -284,10 +499,10 @@ function test() {
 
     //test 7
     console.log("Test icalendar");
-    let dateDebut = "2024-12-23";
-    let dateFin = "2025-01-12";
-    let courses = "AP03";
-    generateICalendar(dateDebut, dateFin, courses);
+    let dateDebut = "2024-11-29";
+    let dateFin = "2024-12-12";
+    let courses = "GP06 AP03 SY06";
+    generateICalendar(dateDebut, dateFin, courses, scheduleAll);
 
 
 
@@ -381,7 +596,7 @@ function MenuPrincipal() {
             let dateDebut = question(couleurQuestion("\tVeuilez indiquer la date de début YYYY-MM-DD (ex : 2024-12-23) : "));
             let dateFin = question(couleurQuestion("\tVeuilez indiquer la date de fin YYYY-MM-DD (ex : 2024-12-30) : "));
             let courses = question(couleurQuestion("\tQuels cours voulez vous examiner ? (ex : AP03 MT01 GL02) : "));
-            generateICalendar(dateDebut, dateFin, courses);
+            generateICalendar(dateDebut, dateFin, courses, scheduleAll);
             break;
         case "8":
             let salle3 = question(couleurQuestion("\tSalle (ex : P101): "));
