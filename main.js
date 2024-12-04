@@ -478,12 +478,42 @@ function saveICSFile(icsContent, filename = 'test.ics') {
 }
 
 
+
+function verifyConflicts(schedule) {
+    const listTimeRoom = [];
+    const conflicts = {}; 
+    const courses = Object.values(schedule);
+    
+    for (const course of courses) {
+        const timeRoom = `${course.room}-${course.time}`;
+
+        if (!listTimeRoom[timeRoom]) {
+    
+            listTimeRoom[timeRoom] = [];
+        }
+        listTimeRoom[timeRoom].push(course.courseId);
+
+        if (listTimeRoom[timeRoom].length > 1) {
+            conflicts[timeRoom] = listTimeRoom[timeRoom]; 
+    }
+
+
+    }
+
+    return conflicts;
+
+}
+
+
+
+
+
 // Tests
 
 function test() {
     const scheduleAll = parseAllFiles('./SujetA_data');
     //test 1 
-    console.log(isRoomOccupied(scheduleAll, 'P101', 'ME 10:00-12:00')); 
+    /*console.log(isRoomOccupied(scheduleAll, 'P101', 'ME 10:00-12:00')); 
     console.log(getRoomCapacity(scheduleAll, 'B103'));
     console.log(findAvailableRooms(scheduleAll, 'ME 10:00-12:00', 30));
 
@@ -500,7 +530,7 @@ function test() {
     //test 6
     const [roomHoursOccupancy, percentageOccupancy] = getNumberOccupation(scheduleAll);
     console.log(roomHoursOccupancy);
-    console.log(percentageOccupancy);
+    console.log(percentageOccupancy);*/
 
     //test 7
     console.log("Test icalendar");
@@ -509,7 +539,9 @@ function test() {
     let courses = "GP06 AP03 SY06";
     generateICalendar(dateDebut, dateFin, courses, scheduleAll);
 
-
+    //test Conflicts 
+    //const conflicts = verifyConflicts(scheduleAll); 
+    //console.log(conflicts);
 
 
 }
@@ -627,6 +659,6 @@ function MenuPrincipal() {
 //const folderPath = question("Veuillez entrer le chemin du dossier data : ");
 //const scheduleAll = parseAllFiles(folderPath);
 
-MenuPrincipal();
+//MenuPrincipal();
 
-//test();
+test();
