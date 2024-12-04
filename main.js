@@ -265,12 +265,17 @@ END:VEVENT
                 startDate = setLocalTimeToUTCDate(currentDate, eventInfo.startTime);
                 endDate = setLocalTimeToUTCDate(currentDate, eventInfo.endTime);
                 
+                let randomUid = '';
+                for (let i = 0; i < 10; i++) {
+                    randomUid += Math.floor(Math.random() * 10).toString();
+                }
+
                 event = {
-                    uid: course, // Nom du cours, à modifier pour un uid random ?
+                    uid: randomUid, // Nom du cours, à modifier pour un uid random ?
                     dtstamp: todayDate.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z",
                     start: startDate.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z", //on formatte la date pour ics
                     end: endDate.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z",
-                    summary: "Cours", // summary arbitraire à changer
+                    summary: course, // summary arbitraire à changer
                     location: i.room, // La salle de cours
                 };
                 
