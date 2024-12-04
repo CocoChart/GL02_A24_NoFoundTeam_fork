@@ -505,7 +505,50 @@ function verifyConflicts(schedule) {
 }
 
 
+function writeConflicts(conflicts) {
+    //je veux écrire un fichier avec un titre, piur savoir que c'est un fichier de conflit, et après pour chaque créneau sorted dans l'ordre chronologique écrire une liste des cours 
 
+    const sortedConflicts = Object.keys(conflicts).sort();
+    let content = "Rapport de conflits\n\n";
+    for (const timeRoom of sortedConflicts) {
+        content += `${timeRoom} : ${conflicts[timeRoom].join(', ')}\n`;
+    }
+
+    fs.writeFileSync('conflicts.txt', content);
+}
+
+
+
+//fonctions de test 
+ function roomExistes(schedule, room) {
+    const courses = Object.values(schedule);
+    for (const course of courses) {
+        if (course.room === room) {
+            return true;
+        }
+    }
+    return false;
+}
+
+function slotExistes(schedule, slot) {
+    const courses = Object.values(schedule);
+    for (const course of courses) {
+        if (course.time === slot) {
+            return true;
+        }
+    }
+    return false;
+}
+
+function courseExistes(schedule, course) {
+    const courses = Object.values(schedule);
+    for (const c of courses) {
+        if (c.courseId === course) {
+            return true;
+        }
+    }
+    return false;
+}
 
 
 // Tests
@@ -549,6 +592,7 @@ function test() {
 
 const question = require('prompt-sync')({sigint: true});
 const chalk = require('chalk');//Permet de gerer les couleurs du texte
+const { exit } = require('process');
 
 const couleurTitre= chalk.hex('#BCA12D');
 const couleurTexteMenu= chalk.hex('#edfbc1');
@@ -557,22 +601,25 @@ const couleurReponse= chalk.hex('#d9d375');
 const couleurRouge= chalk.hex('#ff0000');
 const couleurVert= chalk.hex('#00ff00');
 
-function MenuPrincipal() {
-    const scheduleAll = parseAllFiles('./SujetA_data');
+function MenuPrincipal(scheduleAll) {
+    
+    
 
-    console.log(couleurTitre("\n╔════════════════════════════════════╗"));
-    console.log(couleurTitre("║           MENU PRINCIPAL           ║"));
-    console.log(couleurTitre("╠════════════════════════════════════╝"));
-    console.log(couleurTexteMenu("║      [1] Afficher les créneaux disponibles d'une salle donnée"));
-    console.log(couleurTexteMenu("║      [2] Afficher si une salle est occupée à un créneau donné"));
-    console.log(couleurTexteMenu("║      [3] Afficher les salles et créneaux horaires d'un cours donné"));
-    console.log(couleurTexteMenu("║      [4] Afficher les salles disponibles à un créneau et une capacité donnés"));//Important d'avoir la capacité ?
-    console.log(couleurTexteMenu("║      [5] Afficher les salles triées par capacité"));
-    console.log(couleurTexteMenu("║      [6] Visualiser le taux d'occupation des salles"));
-    console.log(couleurTexteMenu("║      [7] Générer un fichier iCalendar"));
-    console.log(couleurTexteMenu("║      [8] Afficher la capacité maximale d'une salle donnée"));
-    console.log(couleurTexteMenu("║\n║      [9] Quitter"));
-    console.log(couleurTitre("╚═══════════════════════════════════"));
+    console.log(couleurTitre("\n╔═══════════════════════════════════════════════════════════════════════════════╗"));
+    console.log(couleurTitre("║                                MENU PRINCIPAL                                 ║"));
+    console.log(couleurTitre("╠═══════════════════════════════════════════════════════════════════════════════╣"));
+    console.log(couleurTexteMenu("║      [1] Afficher les créneaux disponibles d'une salle donnée                 ║"));
+    console.log(couleurTexteMenu("║      [2] Afficher si une salle est occupée à un créneau donné                 ║"));
+    console.log(couleurTexteMenu("║      [3] Afficher les salles et créneaux horaires d'un cours donné            ║"));
+    console.log(couleurTexteMenu("║      [4] Afficher les salles disponibles à un créneau et une capacité donnés  ║"));
+    console.log(couleurTexteMenu("║      [5] Afficher les salles triées par capacité                              ║"));
+    console.log(couleurTexteMenu("║      [6] Visualiser le taux d'occupation des salles                           ║"));
+    console.log(couleurTexteMenu("║      [7] Générer un fichier iCalendar                                         ║"));
+    console.log(couleurTexteMenu("║      [8] Afficher la capacité maximale d'une salle donnée                     ║"));
+    console.log(couleurTexteMenu("║                                                                               ║"));
+    console.log(couleurTexteMenu("║      [9] Quitter                                                              ║"));
+    console.log(couleurTitre("╚═══════════════════════════════════════════════════════════════════════════════╝"));
+
 
     let option = question(couleurQuestion("Choisissez une option: "));
     switch (option.trim()) {
@@ -582,15 +629,27 @@ function MenuPrincipal() {
 
         case "1":
             let salle1 = question(couleurQuestion("\tSalle (ex : P101): "));
+            while (!roomExistes(scheduleAll, salle1)) {
+                console.log(couleurRouge("La salle n'existe pas"));
+                salle1 = question(couleurQuestion("\tSalle (ex : P101): "));
+            }
             let capacity = getRoomCapacity(scheduleAll, salle1);
-            console.log(couleurReponse("La salle "+salle1+" ("+ capacity.toString() +" places) est disponibles aux crénaux:"));
+            console.log(couleurReponse("La salle "+salle1+" ("+ capacity.toString() +" places) est disponible aux créneaux:"));
             for (let crenau of findAvailableSlots(scheduleAll, salle1)) {
                 console.log(couleurReponse("\t- "+crenau));
             }
             break;
         case "2":
             let salle2 = question(couleurQuestion("\tSalle (ex : P101): "));
+            while (!roomExistes(scheduleAll, salle2)) {
+                console.log(couleurRouge("La salle n'existe pas"));
+                salle2 = question(couleurQuestion("\tSalle (ex : P101): "));
+            }
             let heure = question(couleurQuestion("\tHoraire (ex : ME 10:00-12:00) : "));
+            while (!slotExistes(scheduleAll, heure)) {
+                console.log(couleurRouge("L'horaire n'existe pas"));
+                heure = question(couleurQuestion("\tHoraire (ex : ME 10:00-12:00) : "));
+            }
                 if (isRoomOccupied(scheduleAll, salle2, heure)) {
                     console.log(couleurRouge(`La salle ${salle2} est occupée à ${heure}`+" par le cours "+getCoursesByRoomAndSlot(scheduleAll, salle2, heure)));
                 } else {
@@ -600,6 +659,10 @@ function MenuPrincipal() {
             break;
         case "3":
             let cours = question(couleurQuestion("\tNom du cours (ex : AP03): "));
+            while (!courseExistes(scheduleAll, cours)) {
+                console.log(couleurRouge("Le cours n'existe pas"));
+                cours = question(couleurQuestion("\tNom du cours (ex : AP03): "));
+            }
             console.log(couleurReponse(`Voici les crénaux et salles de cours de l'UE ${cours}`));
             for (let creneau of findCourseSchedule(scheduleAll, cours)) {
                 console.log(couleurReponse(`\t- Crénaux : ${creneau.time} ; Salle : ${creneau.room}`));
@@ -607,8 +670,15 @@ function MenuPrincipal() {
             break; 
         case "4":
             let heure2 = question(couleurQuestion("\tHoraire (ex : ME 10:00-12:00) : "));
+            while (!slotExistes(scheduleAll, heure2)) {
+                console.log(couleurRouge("L'horaire n'existe pas"));
+                heure2 = question(couleurQuestion("\tHoraire (ex : ME 10:00-12:00) : "));
+            }
             let capacite = question(couleurQuestion("\tCapacité : "));
-
+            while (capacité < 0) {
+                console.log(couleurRouge("La capacité doit être un nombre positif"));
+                capacite = question(couleurQuestion("\tCapacité : "));
+            }
             console.log(couleurReponse(`Voici les salles de ${capacite} places disponibles à ${heure2}`));
             for (let salle of findAvailableRooms(scheduleAll, heure2, capacite)) {
                 if (salle !== ""){
@@ -637,6 +707,10 @@ function MenuPrincipal() {
             break;
         case "8":
             let salle3 = question(couleurQuestion("\tSalle (ex : P101): "));
+            while (!roomExistes(scheduleAll, salle3)) {
+                console.log(couleurRouge("La salle n'existe pas"));
+                salle3 = question(couleurQuestion("\tSalle (ex : P101): "));
+            }
             console.log(couleurReponse("La salle "+salle3+" a une capacité maximale de "+getRoomCapacity(scheduleAll, salle3)+" places."));
             break;
             
@@ -645,20 +719,62 @@ function MenuPrincipal() {
             break;     
         }
 
-    if (option.trim() != "9") {        
+    if (option.trim() != "9") {  
         let option2 = question(couleurQuestion("\n\nRetourner au menu principal ? (y/n) "));
+        while (option2 != "y" && option2 != "n") {     
+            console.log(couleurRouge("Veuillez choisir une option valide"));  
+            option2 = question(couleurQuestion("\n\nRetourner au menu principal ? (y/n) "));
+        }
         if (option2.trim().toLowerCase() === "y") {
             console.log("\n\n\n\n\n\n\n\n\n\n")
-            MenuPrincipal();
+            MenuPrincipal(scheduleAll);
         }
     }
 }
 
+
+
+function welcome() {
+    console.log(couleurTitre("\n Welcome ! "));
+    //let path = getPath(); 
+    const scheduleAll = parseAllFiles('./SujetA_data');
+    conflicts = verifyConflicts(scheduleAll);
+    //create file txt with conflicts 
+    writeConflicts(conflicts);
+    console.log(couleurReponse("Le rapport de conflits a été généré"));
+    console.log('Voulez vous afficher le rapport de conflits ? (y/n)');
+    let choix = question(couleurQuestion(''));
+    while (choix != "y" && choix != "n") {
+        console.log(couleurRouge("Veuillez choisir une option valide"));
+        choix = question(couleurQuestion(''));
+    }
+    if (choix === "y") {
+        console.log(couleurReponse("Voici le rapport de conflits :"));
+        console.log(fs.readFileSync('conflicts.txt', 'utf8'));
+        console.log("Souhaitez-vous aller au Menu Principal ? (y/n)");
+        let choix2 = question(couleurQuestion(''));
+        while (choix2 != "y" && choix2 != "n") {
+            console.log(couleurRouge("Veuillez choisir une option valide"));
+            choix2 = question(couleurQuestion(''));
+        }
+        if (choix2 === "y") {
+            MenuPrincipal(scheduleAll);
+        }
+        else {
+            console.log(couleurReponse("Au revoir !"));
+            exit();
+        }
+    }
+    else {
+        MenuPrincipal(scheduleAll);
+    }
+}
 
 //Choix du path du dossier data
 //const folderPath = question("Veuillez entrer le chemin du dossier data : ");
 //const scheduleAll = parseAllFiles(folderPath);
 
 //MenuPrincipal();
+welcome();
 
-test();
+//test();
