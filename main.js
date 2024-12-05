@@ -737,6 +737,7 @@ function welcome() {
     console.log(couleurTitre("\n Welcome ! "));
     //let path = getPath(); 
     const scheduleAll = parseAllFiles('./SujetA_data');
+    console.log(scheduleAll);
     conflicts = verifyConflicts(scheduleAll);
     //create file txt with conflicts 
     writeConflicts(conflicts);
@@ -776,4 +777,4 @@ function welcome() {
 //MenuPrincipal();
 welcome();
 
-//test();
+//test(); 
