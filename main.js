@@ -18,29 +18,9 @@ function parseAllFiles(folderPath) {
 
 
 
+// SPEC 1 et 4 Vérifier l'occupation d'une salle et  Trouver les salles disponibles pour un créneau donné avec les capacités
 
-
-
-
-
-//Fonctionnalités à implémenter
-// Aurélien 0. Faire le menu 
-// Lila 1. Vérifier l'occupation d'une salle et  Trouver les salles disponibles pour un créneau donné avec les capacités 
-// Aurélien 2. Accèder aux créneaux disponibles d'une salle donnée avec la capacité max de la salle
-// Maé 3. Rechercher les salles et les créneaux horaires d'un cours donné 
-// Fait 4. Trouver la capacité maximale d'une salle donnée
-// Mae 5. Classer les salles par capacité d'accueil max 
-// Lila 6. Visualiser le taux d'occupation des salles 
-// 7. Générer un fichier iCalendar entre deux dates données pour des cours sélectionnés 
-
-//relier au menu 
-//faire fonction qui récupere la path du dossier data 
-// fonctionnalité rapport conflits de données 
-// test unitaires
-
-
-
-// Lila 1. Vérifier l'occupation d'une salle et  Trouver les salles disponibles pour un créneau donné avec les capacités
+//fonction qui permet de vérifier si une salle est occupée à un créneau donné
 function isRoomOccupied(schedule, room, time) {
     const courses = Object.values(schedule);
     for (let course of courses) {
@@ -51,6 +31,7 @@ function isRoomOccupied(schedule, room, time) {
     return false;
 }
 
+// fonction qui permet d'avoir la capcité maximale d'une salle donnée
 function getRoomCapacity(schedule, room) {
     const courses = Object.values(schedule); 
     let maxCapacity = 0;
@@ -62,11 +43,13 @@ function getRoomCapacity(schedule, room) {
     return maxCapacity;
 }
 
+//fonction qui permet de trouver les salles disponibles ayant une capacité suffisante à un créneau donné
 function findAvailableRooms(schedule, time, capacity) {
     const listRooms = [];
     const availableRooms = [];
     const courses = Object.values(schedule);
 
+    //récupère la liste des salles
     for (const course of courses) {
         if (!listRooms.includes(course.room)) {
             //console.log(course.room);
@@ -90,8 +73,9 @@ function findAvailableRooms(schedule, time, capacity) {
 
 
 
-// Aurélien 2. Accèder aux créneaux disponibles d'une salle donnée avec la capacité max de la salle
+// SPEC 2. Accèder aux créneaux disponibles d'une salle donnée avec la capacité max de la salle
 
+//fonction qui permet de trouver les créneaux disponibles pour une salle donnée
 function findAvailableSlots(schedule, salle) {
     const creneaux = [];
     const courses = Object.values(schedule);
@@ -116,7 +100,7 @@ function getCoursesByRoomAndSlot(schedule, salle,crenau) {
     }
 }
 
-// Maé 3. Rechercher les salles et les créneaux horaires d'un cours donné 
+// SPEC 3 Rechercher les salles et les créneaux horaires d'un cours donné 
 
 // Fonction pour rechercher les salles et créneaux horaires d'un cours donné
 function findCourseSchedule(schedule, courseName) {
@@ -142,9 +126,7 @@ function findCourseSchedule(schedule, courseName) {
 
 
 
-
-// Lila 4. Trouver la capacité maximale d'une salle donnée (Etape utilisée en 1)
-// Mae 5. Classer les salles par capacité d'accueil max 
+// SPEC 5. Classer les salles par capacité d'accueil max 
 
 //Fonction qui classe les salles en fonction de leur capacité d'accueil
 function geRoomsByCapcity(schedule) {
@@ -180,7 +162,7 @@ function geRoomsByCapcity(schedule) {
 
 
 
-// Lila 6. Visualiser le taux d'occupation des salles 
+// SPEC 6. Visualiser le taux d'occupation des salles 
 
 function getNumberOccupation(schedule) {
     const roomHoursOccupancy = {};  // Dictionary to store room ID and its occupation count
@@ -207,7 +189,7 @@ function getNumberOccupation(schedule) {
 
 
 
-// 7. Maé. Générer un fichier iCalendar entre deux dates données pour des cours sélectionnés 
+// SPEC 7. Générer un fichier iCalendar entre deux dates données pour des cours sélectionnés 
 function generateICalendar(dateDebut, dateFin,courses, scheduleAll) {
 
     // Fonction interne, ajoute chaque event crée dans createEventsForCourses dans icsContent
@@ -481,6 +463,7 @@ function saveICSFile(icsContent, filename = 'test.ics') {
 
 // Vérification des conflits
 
+//fonction qui permet de vérifier les conflits de salle (si il y a plusieurs cours dans la même salle au même créneau)
 function verifyConflicts(schedule) {
     const listTimeRoom = {};
     const conflicts = {}; 
@@ -503,10 +486,9 @@ function verifyConflicts(schedule) {
     return conflicts;
 }
 
-
+//fonction qui permet d'écrire un rapport de conflits dans un fichier txt
 function writeConflicts(conflicts) {
-    //je veux écrire un fichier avec un titre, pour savoir que c'est un fichier de conflit, et après pour chaque créneau sorted dans l'ordre chronologique écrire une liste des cours 
-
+    
     const sortedConflicts = Object.keys(conflicts).sort();
     let content = "Rapport de conflits\n\n";
     for (const timeRoom of sortedConflicts) {
@@ -519,6 +501,8 @@ function writeConflicts(conflicts) {
 
 
 //fonctions de test 
+
+//fonction qui permet de vérifier qu'une salle existe 
  function roomExistes(schedule, room) {
     const courses = Object.values(schedule);
     for (const course of courses) {
@@ -529,6 +513,7 @@ function writeConflicts(conflicts) {
     return false;
 }
 
+//fonction qui permet de vérifier qu'un créneau horaire existe
 function slotExistes(schedule, slot) {
     const courses = Object.values(schedule);
     for (const course of courses) {
@@ -539,6 +524,7 @@ function slotExistes(schedule, slot) {
     return false;
 }
 
+//fonction qui permet de vérifier qu'un cours existe
 function courseExistes(schedule, course) {
     const courses = Object.values(schedule);
     for (const c of courses) {
@@ -550,43 +536,6 @@ function courseExistes(schedule, course) {
 }
 
 
-// Tests
-
-function test() {
-    const scheduleAll = parseAllFiles('./SujetA_data');
-    //test 1 
-    /*console.log(isRoomOccupied(scheduleAll, 'P101', 'ME 10:00-12:00')); 
-    console.log(getRoomCapacity(scheduleAll, 'B103'));
-    console.log(findAvailableRooms(scheduleAll, 'ME 10:00-12:00', 30));
-
-    //test 3
-    const sortedResult = findCourseSchedule(scheduleAll, 'AP03');
-    //Affichage des des salles et créneaux horaires d'un cours
-    console.log(sortedResult);
-
-    //test 5
-    const sortedRooms = geRoomsByCapcity(scheduleAll);
-    //Affichage des salles triées par capacité
-    console.log(sortedRooms);
-
-    //test 6
-    const [roomHoursOccupancy, percentageOccupancy] = getNumberOccupation(scheduleAll);
-    console.log(roomHoursOccupancy);
-    console.log(percentageOccupancy);*/
-
-    //test 7
-    console.log("Test icalendar");
-    let dateDebut = "2024-11-29";
-    let dateFin = "2024-12-12";
-    let courses = "GP06 AP03 SY06";
-    generateICalendar(dateDebut, dateFin, courses, scheduleAll);
-
-    //test Conflicts 
-    //const conflicts = verifyConflicts(scheduleAll); 
-    //console.log(conflicts);
-
-
-}
 
 
 const question = require('prompt-sync')({sigint: true});
@@ -600,6 +549,8 @@ const couleurReponse= chalk.hex('#d9d375');
 const couleurRouge= chalk.hex('#ff0000');
 const couleurVert= chalk.hex('#00ff00');
 
+
+//fonction qui permet d'afficher le menu principal
 function MenuPrincipal(scheduleAll) {
     
     
@@ -732,7 +683,7 @@ function MenuPrincipal(scheduleAll) {
 }
 
 
-
+//fonction d'accueil (appelée au début avant le Menu principal)
 function welcome() {
     console.log(couleurTitre("\n Welcome ! "));
     //let path = getPath(); 
@@ -770,11 +721,6 @@ function welcome() {
     }
 }
 
-//Choix du path du dossier data
-//const folderPath = question("Veuillez entrer le chemin du dossier data : ");
-//const scheduleAll = parseAllFiles(folderPath);
 
 //MenuPrincipal();
 welcome();
-
-//test(); 
