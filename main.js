@@ -477,10 +477,12 @@ function saveICSFile(icsContent, filename = 'test.ics') {
     console.log(`Fichier ${filename} sauvegardé !`);
 }
 
+//////////Fin fonction 7//////////
 
+// Vérification des conflits
 
 function verifyConflicts(schedule) {
-    const listTimeRoom = [];
+    const listTimeRoom = {};
     const conflicts = {}; 
     const courses = Object.values(schedule);
     
@@ -488,25 +490,22 @@ function verifyConflicts(schedule) {
         const timeRoom = `${course.room}-${course.time}`;
 
         if (!listTimeRoom[timeRoom]) {
-    
             listTimeRoom[timeRoom] = [];
         }
+
         listTimeRoom[timeRoom].push(course.courseId);
 
         if (listTimeRoom[timeRoom].length > 1) {
             conflicts[timeRoom] = listTimeRoom[timeRoom]; 
-    }
-
-
+          }
     }
 
     return conflicts;
-
 }
 
 
 function writeConflicts(conflicts) {
-    //je veux écrire un fichier avec un titre, piur savoir que c'est un fichier de conflit, et après pour chaque créneau sorted dans l'ordre chronologique écrire une liste des cours 
+    //je veux écrire un fichier avec un titre, pour savoir que c'est un fichier de conflit, et après pour chaque créneau sorted dans l'ordre chronologique écrire une liste des cours 
 
     const sortedConflicts = Object.keys(conflicts).sort();
     let content = "Rapport de conflits\n\n";
