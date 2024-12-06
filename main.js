@@ -705,7 +705,7 @@ function verifyPathContainsCruFiles(path) {
 function welcome() {
     console.log(couleurTitre("\n Welcome ! "));
     
-    let path = question(couleurQuestion("Entrez le chemin d'accès du dossier Data contenant les fichiers .cru : \n")); 
+    let path = question(couleurQuestion("Entrez le chemin d'accès du dossier Data contenant les fichiers .cru :"));
     const scheduleAll = parseAllFiles(path);
     if (verifyPathContainsCruFiles(path)[0] == false) {
         console.log(couleurRouge("Le dossier ne contient pas de fichiers .cru"));
