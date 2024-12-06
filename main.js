@@ -85,7 +85,7 @@ function findAvailableSlots(schedule, salle) {
             creneaux.push(course.time);
         }
     }
-    return creneaux.sort();
+    return creneaux.sort(); 
 }
 
 
@@ -767,4 +767,5 @@ if (require.main === module) {
     geRoomsByCapcity,
     getNumberOccupation,
     findCourseSchedule,
+    generateICalendar,
   };
