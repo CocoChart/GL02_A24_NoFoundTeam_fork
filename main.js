@@ -751,4 +751,20 @@ function welcome() {
 
 
 //MenuPrincipal();
-welcome();
+if (require.main === module) {
+    welcome();
+  }
+
+
+
+
+  module.exports = {
+    isRoomOccupied,
+    findAvailableRooms,
+    getRoomCapacity,
+    findAvailableSlots,
+    findCourseSchedule, 
+    geRoomsByCapcity,
+    getNumberOccupation,
+    findCourseSchedule,
+  };
