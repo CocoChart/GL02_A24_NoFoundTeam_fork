@@ -13,6 +13,14 @@ npm install chalk@4
 ```
 
 ## Fonctionnement 
+### Tests unitaires
+De nombreux tests unitaires sont disponibles afin de vérifier le bon fonctionnement du programme.
+Pour les lancer, utilisez la commande suivante dans votre terminal :
+```bash
+npx jasmine
+```
+Lors du premier test, il peut être demandé d'installer les packages necessaires.
+
 ### Lancement du programme 
 ```bash
 node main.js
