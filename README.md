@@ -39,7 +39,7 @@ Une fois dans le menu principal, vous avez accès à differentes fonctionnalité
 Une fois la fonctionnalité indiqué, il vous sera demandé les potentielles informations supplémentaires avant de vous indiquer les résultats de votre requête.
 ### Démonstration 
 Une vidéo de démonstration de l'utilisation du programme est disponible [ici](https://drive.google.com/file/d/1Wbp_kOUl3d-fjzd4SITAmiQv6SQKoJNh/view?usp=sharing).
-## Contibuteurs
+## Contributeurs
 Les Algos Sapiens :
 - Bermudez Lucas
 - Boyer Jeanne
