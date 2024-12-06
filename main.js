@@ -682,13 +682,39 @@ function MenuPrincipal(scheduleAll) {
     }
 }
 
+//Fonction qui verifie si le path rentré contient des fichiers crus 
+function verifyPathContainsCruFiles(path) {	
+	let containsCru = false;
+	let containsOnlyCru = true;
+    var files = fs.readdirSync(path);//On récupère la liste des fichiers dans le dossier
+	for (var i=0; i<files.length; i++){ //Pour chaque fichier
+		var filePath = path + '/' + files[i]; //On crée le chemin d'accès au fichier
+		var extension = files[i].split('.'); //la dernière partie de 'extension' est l'extension
+		if (fs.lstatSync(filePath).isDirectory()){ //Si c'est un dossier
+			[containsCru,containsOnlyCru] = verifyPathContainsCruFiles(filePath); //On vérifie si le dossier contient des fichiers crus
+		} else if (extension[(extension.length)-1]=='cru'){ //Si l'extension est 'cru'
+			containsCru = true; //On met containsCru à true
+		} else if (extension[(extension.length)-1]!='cru'){ //Si l'extension n'est pas 'cru'
+			containsOnlyCru = false; //On met containsOnlyCru à false
+		}
+		return [containsCru,containsOnlyCru];
+	}
+}
 
 //fonction d'accueil (appelée au début avant le Menu principal)
 function welcome() {
     console.log(couleurTitre("\n Welcome ! "));
-    //let path = getPath(); 
-    const scheduleAll = parseAllFiles('./SujetA_data');
-    console.log(scheduleAll);
+    let path = question(couleurQuestion("Entrez le chemin d'accès du dossier Data contenant les fichiers .cru : \n")); 
+    const scheduleAll = parseAllFiles(path);
+    if (verifyPathContainsCruFiles(path)[0] == false) {
+        console.log(couleurRouge("Le dossier ne contient pas de fichiers .cru"));
+        welcome();
+    } else if (verifyPathContainsCruFiles(path)[1] == false) {
+        console.log(couleurRouge("Le dossier contient des fichiers autres que .cru"));
+        welcome();
+    } else {
+
+    //console.log(scheduleAll);
     conflicts = verifyConflicts(scheduleAll);
     //create file txt with conflicts 
     writeConflicts(conflicts);
@@ -719,6 +745,7 @@ function welcome() {
     else {
         MenuPrincipal(scheduleAll);
     }
+}
 }
 
 
