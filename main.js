@@ -704,6 +704,7 @@ function verifyPathContainsCruFiles(path) {
 //fonction d'accueil (appelée au début avant le Menu principal)
 function welcome() {
     console.log(couleurTitre("\n Welcome ! "));
+    
     let path = question(couleurQuestion("Entrez le chemin d'accès du dossier Data contenant les fichiers .cru : \n")); 
     const scheduleAll = parseAllFiles(path);
     if (verifyPathContainsCruFiles(path)[0] == false) {
