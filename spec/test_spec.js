@@ -117,6 +117,7 @@ describe ("Scenarios de tests du projet de gestion d'emploi du temps: \n", () =>
         });
 
         it ('le fichier doit contenir les cours', () => {
+            generateICalendar(dateDebut, dateFin, courses, sampleSchedule);
             const fileContent = fs.readFileSync(dateDebut + " " + dateFin + " " + courses + ".ics", 'utf8');
             expect(fileContent).toContain('BEGIN:VCALENDAR');
             expect(fileContent).toContain('BEGIN:VEVENT');
@@ -186,11 +187,12 @@ describe ("Scenarios de tests du projet de gestion d'emploi du temps: \n", () =>
         });
 
         it ('doit créer un fichier txt avec les conflits',() =>{
-            writeConflicts(verifyConflicts(sample), "conflits");
+            writeConflicts(verifyConflicts(sample));
             expect(fs.existsSync("conflicts.txt")).toBe(true);
         }); 
 
         it ('doit écrire les conflits dans le fichier txt', () =>{
+            writeConflicts(verifyConflicts(sample));
             const fileContent = fs.readFileSync("conflicts.txt", 'utf8');
             expect(fileContent).toContain('AP03');
             expect(fileContent).toContain('SY01');

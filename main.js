@@ -138,7 +138,7 @@ function geRoomsByCapcity(schedule) {
         //courseList.forEach(course => {
 
             //Si la salle n'a pas été traitées
-            if (!roomsNames.includes(course.room)){
+            if (!roomsNames.includes(course.room)&&course.room!="") {
                 // Ajouter la salle avec sa capacité au tableau rooms
                 rooms.push({
                     room: course.room,
@@ -171,12 +171,14 @@ function getNumberOccupation(schedule) {
     courses.sort((a, b) => a.room.localeCompare(b.room));
     
     for (const course of courses) {
+        if (!course.room) continue;
         if (!roomHoursOccupancy[course.room]) {
             roomHoursOccupancy[course.room] = 0;        
         }
         roomHoursOccupancy[course.room]+=2;  // Increment the count for this room
     }
     for (const course of courses){
+        if (!course.room) continue;
         percentageOccupancy[course.room] = (roomHoursOccupancy[course.room] / 60) * 100;
     }
     
@@ -614,9 +616,9 @@ function MenuPrincipal(scheduleAll) {
                 console.log(couleurRouge("Le cours n'existe pas"));
                 cours = question(couleurQuestion("\tNom du cours (ex : AP03): "));
             }
-            console.log(couleurReponse(`Voici les crénaux et salles de cours de l'UE ${cours}`));
+            console.log(couleurReponse(`Voici les créneaux et salles de cours de l'UE ${cours}`));
             for (let creneau of findCourseSchedule(scheduleAll, cours)) {
-                console.log(couleurReponse(`\t- Crénaux : ${creneau.time} ; Salle : ${creneau.room}`));
+                console.log(couleurReponse(`\t- Créneaux : ${creneau.time} ; Salle : ${creneau.room}`));
             }
             break; 
         case "4":
