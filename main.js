@@ -541,6 +541,7 @@ function courseExistes(schedule, course) {
 const question = require('prompt-sync')({sigint: true});
 const chalk = require('chalk');//Permet de gerer les couleurs du texte
 const { exit } = require('process');
+const { verify } = require('crypto');
 
 const couleurTitre= chalk.hex('#BCA12D');
 const couleurTexteMenu= chalk.hex('#edfbc1');
@@ -768,4 +769,10 @@ if (require.main === module) {
     getNumberOccupation,
     findCourseSchedule,
     generateICalendar,
+    verifyConflicts,
+    writeConflicts,
+    roomExistes,
+    slotExistes,
+    courseExistes,
+    parseFile,
   };

@@ -1,9 +1,9 @@
 const fs = require('fs');
-const {isRoomOccupied, getRoomCapacity, findAvailableRooms, findAvailableSlots, geRoomsByCapcity, getNumberOccupation, findCourseSchedule, generateICalendar} = require('../main.js');
+const {isRoomOccupied, getRoomCapacity, findAvailableRooms, findAvailableSlots, geRoomsByCapcity, getNumberOccupation, findCourseSchedule, generateICalendar, verifyConflicts, writeConflicts, roomExistes, slotExistes, courseExistes, parseFile} = require('../main.js');
 
 // Test cases
 
-describe ("Scenarios de tests du projet de gestion d'emploi du temps", () => {
+describe ("Scenarios de tests du projet de gestion d'emploi du temps: \n", () => {
     let sampleSchedule; 
     beforeEach(() => {
         sampleSchedule = [{
@@ -155,6 +155,75 @@ describe ("Scenarios de tests du projet de gestion d'emploi du temps", () => {
             expect(fileContent.match(/SUMMARY:AP03/g).length).toEqual(2);
         }); 
         
+    });
+
+    describe ("Vérification des conflits", () => {
+        sample=[{
+            courseId: 'AP03',
+            index: 1,
+            type: 'D2',
+            capacity: 24,
+            time: 'V 13:00-16:00',
+            group: 'F1',
+            room: 'B103'
+          },
+          {
+            courseId: 'SY01',
+            index: 1,
+            type: 'D2',
+            capacity: 24,
+            time: 'V 13:00-16:00',
+            group: 'F1',
+            room: 'B103'
+          }];
+
+        it ('doit renvoyer une liste avec les conflits',() =>{
+            expect(verifyConflicts(sample)).toEqual({"B103-V 13:00-16:00": [ 'AP03', 'SY01' ] }); 
+        }); 
+        
+        it ('doit renvoyer une liste vide si aucun conflit',() =>{
+            expect(verifyConflicts(sampleSchedule)).toEqual({});
+        });
+
+        it ('doit créer un fichier txt avec les conflits',() =>{
+            writeConflicts(verifyConflicts(sample), "conflits");
+            expect(fs.existsSync("conflicts.txt")).toBe(true);
+        }); 
+
+        it ('doit écrire les conflits dans le fichier txt', () =>{
+            const fileContent = fs.readFileSync("conflicts.txt", 'utf8');
+            expect(fileContent).toContain('AP03');
+            expect(fileContent).toContain('SY01');
+        }); 
+
+    }); 
+
+    describe ("Vérification de l'existence des données ", () => {
+        it ('doit renvoyer vrai si la salle existe',() =>{
+            expect(roomExistes(sampleSchedule, 'B103')).toBe(true);
+        }); 
+        it ('doit renvoyer faux si la salle n\'existe pas',() =>{
+            expect(roomExistes(sampleSchedule, 'B104')).toBe(false);
+        }); 
+        it ('doit renvoyer vrai si le créneau existe',() =>{
+            expect(slotExistes(sampleSchedule, 'V 13:00-16:00')).toBe(true);
+        }); 
+        it ('doit renvoyer faux si le créneau n\'existe pas',() =>{
+            expect(slotExistes(sampleSchedule, 'V 16:00-19:00')).toBe(false);
+        }); 
+        it ('doit renvoyer vrai si le cours existe',() =>{
+            expect(courseExistes(sampleSchedule, 'AP03')).toBe(true);
+        });
+        it ('doit renvoyer faux si le cours n\'existe pas',() =>{
+            expect(courseExistes(sampleSchedule, 'RE10')).toBe(false);
+        });
+    }); 
+
+    describe ("Parsing du fichier", () => {
+        it ('doit renvoyer une liste de cours',() =>{
+            const sampleFile = 'sample.cru';
+            expect(parseFile(sampleFile)).toEqual([ { courseId: 'AP03', index: 1, type: 'D1', capacity: 25, time: 'V 9:00-12:00', group: 'F1', room: 'B103' }, { courseId: 'AP03', index: 1, type: 'D2', capacity: 24, time: 'V 13:00-16:00', group: 'F1', room: 'B103' } ]);
+        }); 
     });
 
 });
