@@ -569,8 +569,9 @@ function MenuPrincipal(scheduleAll) {
     console.log(couleurTexteMenu("║      [6] Visualiser le taux d'occupation des salles                           ║"));
     console.log(couleurTexteMenu("║      [7] Générer un fichier iCalendar                                         ║"));
     console.log(couleurTexteMenu("║      [8] Afficher la capacité maximale d'une salle donnée                     ║"));
+    console.log(couleurTexteMenu("║      [9] Afficher le rapport de conflits                                      ║"));
     console.log(couleurTexteMenu("║                                                                               ║"));
-    console.log(couleurTexteMenu("║      [9] Quitter                                                              ║"));
+    console.log(couleurTexteMenu("║      [0] Quitter                                                              ║"));
     console.log(couleurTitre("╚═══════════════════════════════════════════════════════════════════════════════╝"));
 
 
@@ -666,13 +667,17 @@ function MenuPrincipal(scheduleAll) {
             }
             console.log(couleurReponse("La salle "+salle3+" a une capacité maximale de "+getRoomCapacity(scheduleAll, salle3)+" places."));
             break;
-            
         case "9":
+            console.log(couleurReponse("Voici le rapport de conflits :"));
+            console.log(fs.readFileSync('conflicts.txt', 'utf8'));
+            break;
+            
+        case "0":
             console.log(couleurReponse("Au revoir !"));
             break;     
         }
 
-    if (option.trim() != "9") {  
+    if (option.trim() != "0") {  
         let option2 = question(couleurQuestion("\n\nRetourner au menu principal ? (y/n) "));
         while (option2 != "y" && option2 != "n") {     
             console.log(couleurRouge("Veuillez choisir une option valide"));  
