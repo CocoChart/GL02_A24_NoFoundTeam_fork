@@ -628,7 +628,7 @@ function MenuPrincipal(scheduleAll) {
                 heure2 = question(couleurQuestion("\tHoraire (ex : ME 10:00-12:00) : "));
             }
             let capacite = question(couleurQuestion("\tCapacité : "));
-            while (capacité < 0) {
+            while (capacite < 0) {
                 console.log(couleurRouge("La capacité doit être un nombre positif"));
                 capacite = question(couleurQuestion("\tCapacité : "));
             }
