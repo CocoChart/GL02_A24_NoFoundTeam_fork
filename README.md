@@ -42,7 +42,8 @@ Une fois dans le menu principal, vous avez accès à differentes fonctionnalité
 6) Visualiser le taux d'occupation des salles
 7) Générer un fichier iCalendar
 8) Afficher la capacité maximale d'une salle donnée
-9) Quitter le programme
+9) Afficher le rapport de conflits
+0) Quitter le programme
 
 Une fois la fonctionnalité indiqué, il vous sera demandé les potentielles informations supplémentaires avant de vous indiquer les résultats de votre requête.
 ### Démonstration 
