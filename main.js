@@ -528,40 +528,46 @@ function writeConflicts(conflicts) {
 
 //fonctions de test 
 
-//fonction qui permet de vérifier qu'une salle existe 
- function roomExistes(schedule, room) {
-    const courses = Object.values(schedule);
-    for (const course of courses) {
-        if (course.room === room) {
-            return true;
-        }
-    }
-    return false;
+// **REFACTORING #1 (début) J.BOYER
+// Fonction générique pour vérifier si une propriété existe dans l'emploi du temps
+function existsInSchedule(schedule, property, value) {
+    return Object.values(schedule).some(course => course[property] === value);
 }
 
-//fonction qui permet de vérifier qu'un créneau horaire existe
-function slotExistes(schedule, slot) {
-    const courses = Object.values(schedule);
-    for (const course of courses) {
-        if (course.time === slot) {
-            return true;
-        }
-    }
-    return false;
-}
-
+// //fonction qui permet de vérifier qu'une salle existe 
+// function roomExistes(schedule, room) {
+//     const courses = Object.values(schedule);
+//     for (const course of courses) {
+//         if (course.room === room) {
+//             return true;
+//         }
+//     }
+//     return false;
+// }
+//
+// //fonction qui permet de vérifier qu'un créneau horaire existe
+// function slotExistes(schedule, slot) {
+//     const courses = Object.values(schedule);
+//     for (const course of courses) {
+//         if (course.time === slot) {
+//             return true;
+//         }
+//     }
+//     return false;
+// }
+// 
 //fonction qui permet de vérifier qu'un cours existe
-function courseExistes(schedule, course) {
-    const courses = Object.values(schedule);
-    for (const c of courses) {
-        if (c.courseId === course) {
-            return true;
-        }
-    }
-    return false;
-}
-
-
+// function courseExistes(schedule, course) {
+//     const courses = Object.values(schedule);
+//     for (const c of courses) {
+//         if (c.courseId === course) {
+//             return true;
+//         }
+//     }
+//     return false;
+// }
+// 
+// **REFACTORING #1 (fin) J.BOYER
 
 
 const question = require('prompt-sync')({sigint: true});
@@ -611,7 +617,7 @@ function MenuPrincipal(scheduleAll) {
 
         case "1":
             let salle1 = questionClr("\tSalle (ex : P101): ");
-            while (!roomExistes(scheduleAll, salle1)) {
+            while (!existsInSchedule(scheduleAll, "room", salle1)) {
                 console.log(couleurRouge("La salle n'existe pas"));
                 salle1 = questionClr("\tSalle (ex : P101): ");
             }
@@ -623,12 +629,12 @@ function MenuPrincipal(scheduleAll) {
             break;
         case "2":
             let salle2 = questionClr("\tSalle (ex : P101): ");
-            while (!roomExistes(scheduleAll, salle2)) {
+            while (!existsInSchedule(scheduleAll, "room", salle2)) {
                 console.log(couleurRouge("La salle n'existe pas"));
                 salle2 = questionClr("\tSalle (ex : P101): ");
             }
             let heure = questionClr("\tHoraire (ex : ME 10:00-12:00) : ");
-            while (!slotExistes(scheduleAll, heure)) {
+            while (!existsInSchedule(scheduleAll, "time", heure)) {
                 console.log(couleurRouge("L'horaire n'existe pas"));
                 heure = questionClr("\tHoraire (ex : ME 10:00-12:00) : ");
             }
@@ -641,7 +647,7 @@ function MenuPrincipal(scheduleAll) {
             break;
         case "3":
             let cours = questionClr("\tNom du cours (ex : AP03): ");
-            while (!courseExistes(scheduleAll, cours)) {
+            while (!existsInSchedule(scheduleAll, "courseId", cours)) {
                 console.log(couleurRouge("Le cours n'existe pas"));
                 cours = questionClr("\tNom du cours (ex : AP03): ");
             }
@@ -652,7 +658,7 @@ function MenuPrincipal(scheduleAll) {
             break; 
         case "4":
             let heure2 = questionClr("\tHoraire (ex : ME 10:00-12:00) : ");
-            while (!slotExistes(scheduleAll, heure2)) {
+            while (!existsInSchedule(scheduleAll, "time", heure2)) {
                 console.log(couleurRouge("L'horaire n'existe pas"));
                 heure2 = questionClr("\tHoraire (ex : ME 10:00-12:00) : ");
             }
@@ -690,7 +696,7 @@ function MenuPrincipal(scheduleAll) {
             break;
         case "8":
             let salle3 = questionClr("\tSalle (ex : P101): ");
-            while (!roomExistes(scheduleAll, salle3)) {
+            while (!existsInSchedule(scheduleAll, "room", salle3)) {
                 console.log(couleurRouge("La salle n'existe pas"));
                 salle3 = questionClr("\tSalle (ex : P101): ");
             }
@@ -815,8 +821,11 @@ if (require.main === module) {
     generateICalendar,
     verifyConflicts,
     writeConflicts,
-    roomExistes,
-    slotExistes,
-    courseExistes,
+    // REFACTORING #1 (debut) J.BOYER
+    existsInSchedule,
+    // roomExistes,   
+    // slotExistes,
+    // courseExistes, 
+    // REFACTORING #1 (fin) J.BOYER
     parseFile,
   };
