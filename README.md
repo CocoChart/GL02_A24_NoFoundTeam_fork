@@ -12,6 +12,10 @@ Le projet fonctionnant sous NodeJS, il peut être nécessaire d'installer des d�
 npm install chalk@4
 ```
 
+```bash
+npm install prompt-sync
+```
+
 ## Fonctionnement 
 ### Tests unitaires
 De nombreux tests unitaires sont disponibles afin de vérifier le bon fonctionnement du programme.
