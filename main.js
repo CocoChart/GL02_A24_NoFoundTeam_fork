@@ -1,6 +1,6 @@
-const { yellow, red, green } = require('colors');
+// const { yellow, red, green } = require('colors');
 const { parseFile } = require('./parser');
-const fs = require('fs');
+const fs  = require('fs');
 
 // Function to parse the files 
 function parseAllFiles(folderPath) {
@@ -182,6 +182,7 @@ function getNumberOccupation(schedule) {
         percentageOccupancy[course.room] = (roomHoursOccupancy[course.room] / 60) * 100;
     }
     
+    
     return [roomHoursOccupancy, percentageOccupancy];  // Return the dictionary with room IDs and their occupation counts
 }
 
@@ -191,10 +192,21 @@ function getNumberOccupation(schedule) {
 
 
 
-// SPEC 7. Générer un fichier iCalendar entre deux dates données pour des cours sélectionnés 
-function generateICalendar(dateDebut, dateFin,courses, scheduleAll) {
 
-    // Fonction interne, ajoute chaque event crée dans createEventsForCourses dans icsContent
+/**
+ * SPEC 7. Générer un fichier iCalendar entre deux dates données pour des cours sélectionnés 
+ * 
+ *
+ * @param {string} dateDebut - La date de début
+ * @param {string} dateFin - La date de fin
+ * @param {array} courses - Liste des cours
+ * @param {array} scheduleAll - calendrier
+ * @returns {void}
+ */
+function generateICalendar(dateDebut, dateFin, courses, scheduleAll) {
+
+    // **Fonction imbriquée (NESTED) interne
+    // ajoute chaque event crée dans createEventsForCourses dans icsContent
     function addEventToICS(event) {
         const eventContent = `
 BEGIN:VEVENT
@@ -210,7 +222,8 @@ END:VEVENT
         icsContent += eventContent + '\n\n'; // Ajoute un saut de ligne pour séparer les événements
     };
 
-    // On vient créer et insérer dans le calendrier des évenements à chaque occurence du cours 
+    // **Fonction imbriquée (NESTED) 
+    // crée et insére dans le calendrier des évenements à chaque occurence du cours 
     // choisi par l'utilisateur
     function createEventsForCourses(schedule, course, period){
         // initialisation variables
@@ -255,12 +268,12 @@ END:VEVENT
                 }
 
                 event = {
-                    uid: randomUid, // Nom du cours, à modifier pour un uid random ?
-                    dtstamp: todayDate.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z",
-                    start: startDate.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z", //on formatte la date pour ics
-                    end: endDate.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z",
-                    summary: course, // summary arbitraire à changer
-                    location: i.room, // La salle de cours
+                    uid     : randomUid,                                                          // Nom du cours, à modifier pour un uid random ?
+                    dtstamp : todayDate.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z",
+                    start   : startDate.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z",   //on formatte la date pour ics
+                    end     : endDate.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z",
+                    summary : course,                                                             // summary arbitraire à changer
+                    location: i.room,                                                             // La salle de cours
                 };
                 
                 // On ajoute l'event à icsContent qui servira à générer un fichier ics
@@ -277,6 +290,7 @@ END:VEVENT
            }
         }
         
+        // **Fonction imbriquée (NESTED) 
         // Formatte les données de schedule du cours donné.
         function parseSchedule(courseTime) {
             // Regex pour extraire le jour et les heures de la string course.time
@@ -314,6 +328,74 @@ END:VEVENT
 
     };
 
+    // **Fonction imbriquée (NESTED)   
+    //Trouver le jour de la semaine correspondant à la date et return une structure avec les infos importantes
+    function getPeriod(dateStringStart, dateStringEnd) {
+        // Créer un objet Date à partir de la chaîne de date
+        const dateStart = new Date(dateStringStart);
+        // Vérifier si la date est valide
+        if (isNaN(dateStart)) {
+            throw new Error("Erreur : Date de début invalide"); // Lancer une exception
+        }
+        const dateEnd = new Date(dateStringEnd);
+        if (isNaN(dateEnd)) {
+            throw new Error("Erreur : Date de fin invalide"); // Lancer une exception
+        }
+        
+        ////// On vient compter le nombre de jours entre les deux dates
+        const timestamp1 = dateStart.getTime();
+        const timestamp2 = dateEnd.getTime();
+
+        // On vérifie que timestamp1 < timestamp2
+        if (timestamp2 < timestamp1) {
+            throw new Error("Erreur : Date de début > date de fin"); // Lancer une exception
+        }
+
+        // Calculer la différence en millisecondes
+        const differenceInMilliseconds = Math.abs(timestamp2 - timestamp1);
+
+        // Convertir la différence en jours
+        const millisecondsInADay = 1000 * 60 * 60 * 24; // 1000 ms * 60 s * 60 min * 24 h
+        const differenceInDays = Math.floor(differenceInMilliseconds / millisecondsInADay);
+
+
+        // Obtenir le jour de la semaine (0 = dimanche, 1 = lundi, ..., 6 = samedi) 
+        // conditionnne tout le reste de l'algo (comparaisons dans createEventsForCourses)
+        const dayIndex = dateStart.getDay();
+
+        // Tableau des jours de la semaine
+        const daysOfWeek = ["Dimanche", "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"];
+
+        period = {
+            dateStart,
+            dateEnd,
+            dayIndex,
+            weekDayStart : daysOfWeek[dayIndex],
+            differenceInDays
+        }
+
+        // Retourner le jour de la semaine
+        return period;
+    };
+
+    // **Fonction imbriquée (NESTED) 
+    // Sert à extraire les cours d'une string en contenant plusieurs
+    function extractCourses(input) {
+        // Supprimer les espaces supplémentaires et diviser la chaîne par des espaces, des virgules ou des points-virgules
+        const codes = input.trim().split(/[\s,;]+/);
+
+        // Utiliser un Set pour éliminer les doublons
+        const codesUniques = new Set(codes);
+
+        // Vérifier s'il y a des doublons
+        if (codes.length !== codesUniques.size) {
+            console.warn("Attention : des codes en double ont été trouvés !");
+        }
+
+        // Retourner un tableau des codes uniques
+        return Array.from(codesUniques);
+    }
+
 
     ///////////// Début de la fonction generateICalendar() ////////////////////
 
@@ -343,71 +425,7 @@ CALSCALE:GREGORIAN
     saveICSFile(icsContent, fileName);
 }
 
-//Trouver le jour de la semaine correspondant à la date et return une structure avec les infos importantes
-function getPeriod(dateStringStart, dateStringEnd) {
-    // Créer un objet Date à partir de la chaîne de date
-    const dateStart = new Date(dateStringStart);
-    // Vérifier si la date est valide
-    if (isNaN(dateStart)) {
-        throw new Error("Erreur : Date de début invalide"); // Lancer une exception
-    }
-    const dateEnd = new Date(dateStringEnd);
-    if (isNaN(dateEnd)) {
-        throw new Error("Erreur : Date de fin invalide"); // Lancer une exception
-    }
-    
-    ////// On vient compter le nombre de jours entre les deux dates
-    const timestamp1 = dateStart.getTime();
-    const timestamp2 = dateEnd.getTime();
 
-    // On vérifie que timestamp1 < timestamp2
-    if (timestamp2 < timestamp1) {
-        throw new Error("Erreur : Date de début > date de fin"); // Lancer une exception
-    }
-
-    // Calculer la différence en millisecondes
-    const differenceInMilliseconds = Math.abs(timestamp2 - timestamp1);
-
-    // Convertir la différence en jours
-    const millisecondsInADay = 1000 * 60 * 60 * 24; // 1000 ms * 60 s * 60 min * 24 h
-    const differenceInDays = Math.floor(differenceInMilliseconds / millisecondsInADay);
-
-
-    // Obtenir le jour de la semaine (0 = dimanche, 1 = lundi, ..., 6 = samedi) 
-    // conditionnne tout le reste de l'algo (comparaisons dans createEventsForCourses)
-    const dayIndex = dateStart.getDay();
-
-    // Tableau des jours de la semaine
-    const daysOfWeek = ["Dimanche", "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"];
-
-    period = {
-        dateStart,
-        dateEnd,
-        dayIndex,
-        weekDayStart : daysOfWeek[dayIndex],
-        differenceInDays
-    }
-
-    // Retourner le jour de la semaine
-    return period;
-};
-
-// Sert à extraire les cours d'une string en contenant plusieurs
-function extractCourses(input) {
-    // Supprimer les espaces supplémentaires et diviser la chaîne par des espaces, des virgules ou des points-virgules
-    const codes = input.trim().split(/[\s,;]+/);
-
-    // Utiliser un Set pour éliminer les doublons
-    const codesUniques = new Set(codes);
-
-    // Vérifier s'il y a des doublons
-    if (codes.length !== codesUniques.size) {
-        console.warn("Attention : des codes en double ont été trouvés !");
-    }
-
-    // Retourner un tableau des codes uniques
-    return Array.from(codesUniques);
-}
 
 /**
  * Ajoute un horaire (dans le fuseau horaire local) à une date et convertie le tout en format UTC 
@@ -553,6 +571,10 @@ const couleurRouge= chalk.hex('#ff0000');
 const couleurVert= chalk.hex('#00ff00');
 
 
+const questionClr = (str) => question(couleurQuestion(str));
+
+
+
 //fonction qui permet d'afficher le menu principal
 function MenuPrincipal(scheduleAll) {
     
@@ -582,10 +604,10 @@ function MenuPrincipal(scheduleAll) {
             break;
 
         case "1":
-            let salle1 = question(couleurQuestion("\tSalle (ex : P101): "));
+            let salle1 = questionClr("\tSalle (ex : P101): ");
             while (!roomExistes(scheduleAll, salle1)) {
                 console.log(couleurRouge("La salle n'existe pas"));
-                salle1 = question(couleurQuestion("\tSalle (ex : P101): "));
+                salle1 = questionClr("\tSalle (ex : P101): ");
             }
             let capacity = getRoomCapacity(scheduleAll, salle1);
             console.log(couleurReponse("La salle "+salle1+" ("+ capacity.toString() +" places) est disponible aux créneaux:"));
@@ -594,15 +616,15 @@ function MenuPrincipal(scheduleAll) {
             }
             break;
         case "2":
-            let salle2 = question(couleurQuestion("\tSalle (ex : P101): "));
+            let salle2 = questionClr("\tSalle (ex : P101): ");
             while (!roomExistes(scheduleAll, salle2)) {
                 console.log(couleurRouge("La salle n'existe pas"));
-                salle2 = question(couleurQuestion("\tSalle (ex : P101): "));
+                salle2 = questionClr("\tSalle (ex : P101): ");
             }
-            let heure = question(couleurQuestion("\tHoraire (ex : ME 10:00-12:00) : "));
+            let heure = questionClr("\tHoraire (ex : ME 10:00-12:00) : ");
             while (!slotExistes(scheduleAll, heure)) {
                 console.log(couleurRouge("L'horaire n'existe pas"));
-                heure = question(couleurQuestion("\tHoraire (ex : ME 10:00-12:00) : "));
+                heure = questionClr("\tHoraire (ex : ME 10:00-12:00) : ");
             }
                 if (isRoomOccupied(scheduleAll, salle2, heure)) {
                     console.log(couleurRouge(`La salle ${salle2} est occupée à ${heure}`+" par le cours "+getCoursesByRoomAndSlot(scheduleAll, salle2, heure)));
@@ -612,10 +634,10 @@ function MenuPrincipal(scheduleAll) {
             
             break;
         case "3":
-            let cours = question(couleurQuestion("\tNom du cours (ex : AP03): "));
+            let cours = questionClr("\tNom du cours (ex : AP03): ");
             while (!courseExistes(scheduleAll, cours)) {
                 console.log(couleurRouge("Le cours n'existe pas"));
-                cours = question(couleurQuestion("\tNom du cours (ex : AP03): "));
+                cours = questionClr("\tNom du cours (ex : AP03): ");
             }
             console.log(couleurReponse(`Voici les créneaux et salles de cours de l'UE ${cours}`));
             for (let creneau of findCourseSchedule(scheduleAll, cours)) {
@@ -623,15 +645,15 @@ function MenuPrincipal(scheduleAll) {
             }
             break; 
         case "4":
-            let heure2 = question(couleurQuestion("\tHoraire (ex : ME 10:00-12:00) : "));
+            let heure2 = questionClr("\tHoraire (ex : ME 10:00-12:00) : ");
             while (!slotExistes(scheduleAll, heure2)) {
                 console.log(couleurRouge("L'horaire n'existe pas"));
-                heure2 = question(couleurQuestion("\tHoraire (ex : ME 10:00-12:00) : "));
+                heure2 = questionClr("\tHoraire (ex : ME 10:00-12:00) : ");
             }
-            let capacite = question(couleurQuestion("\tCapacité : "));
+            let capacite = questionClr("\tCapacité : ");
             while (capacite < 0) {
                 console.log(couleurRouge("La capacité doit être un nombre positif"));
-                capacite = question(couleurQuestion("\tCapacité : "));
+                capacite = questionClr("\tCapacité : ");
             }
             console.log(couleurReponse(`Voici les salles de ${capacite} places disponibles à ${heure2}`));
             for (let salle of findAvailableRooms(scheduleAll, heure2, capacite)) {
@@ -654,16 +676,16 @@ function MenuPrincipal(scheduleAll) {
             }
             break
         case "7":
-            let dateDebut = question(couleurQuestion("\tVeuilez indiquer la date de début YYYY-MM-DD (ex : 2024-12-23) : "));
-            let dateFin = question(couleurQuestion("\tVeuilez indiquer la date de fin YYYY-MM-DD (ex : 2024-12-30) : "));
-            let courses = question(couleurQuestion("\tQuels cours voulez vous examiner ? (ex : AP03 MT01 GL02) : "));
+            let dateDebut = questionClr("\tVeuilez indiquer la date de début YYYY-MM-DD (ex : 2024-12-23) : ");
+            let dateFin = questionClr("\tVeuilez indiquer la date de fin YYYY-MM-DD (ex : 2024-12-30) : ");
+            let courses = questionClr("\tQuels cours voulez vous examiner ? (ex : AP03 MT01 GL02) : ");
             generateICalendar(dateDebut, dateFin, courses, scheduleAll);
             break;
         case "8":
-            let salle3 = question(couleurQuestion("\tSalle (ex : P101): "));
+            let salle3 = questionClr("\tSalle (ex : P101): ");
             while (!roomExistes(scheduleAll, salle3)) {
                 console.log(couleurRouge("La salle n'existe pas"));
-                salle3 = question(couleurQuestion("\tSalle (ex : P101): "));
+                salle3 = questionClr("\tSalle (ex : P101): ");
             }
             console.log(couleurReponse("La salle "+salle3+" a une capacité maximale de "+getRoomCapacity(scheduleAll, salle3)+" places."));
             break;
@@ -678,10 +700,10 @@ function MenuPrincipal(scheduleAll) {
         }
 
     if (option.trim() != "0") {  
-        let option2 = question(couleurQuestion("\n\nRetourner au menu principal ? (y/n) "));
+        let option2 = questionClr("\n\nRetourner au menu principal ? (y/n) ");
         while (option2 != "y" && option2 != "n") {     
             console.log(couleurRouge("Veuillez choisir une option valide"));  
-            option2 = question(couleurQuestion("\n\nRetourner au menu principal ? (y/n) "));
+            option2 = questionClr("\n\nRetourner au menu principal ? (y/n) ");
         }
         if (option2.trim().toLowerCase() === "y") {
             console.log("\n\n\n\n\n\n\n\n\n\n")
@@ -713,7 +735,7 @@ function verifyPathContainsCruFiles(path) {
 function welcome() {
     console.log(couleurTitre("\n Welcome ! "));
     
-    let path = question(couleurQuestion("Entrez le chemin d'accès du dossier Data contenant les fichiers .cru :"));
+    let path = questionClr("Entrez le chemin d'accès du dossier Data contenant les fichiers .cru :");
     const scheduleAll = parseAllFiles(path);
     if (verifyPathContainsCruFiles(path)[0] == false) {
         console.log(couleurRouge("Le dossier ne contient pas de fichiers .cru"));
@@ -729,19 +751,19 @@ function welcome() {
     writeConflicts(conflicts);
     console.log(couleurReponse("Le rapport de conflits a été généré"));
     console.log('Voulez vous afficher le rapport de conflits ? (y/n)');
-    let choix = question(couleurQuestion(''));
+    let choix = questionClr('');
     while (choix != "y" && choix != "n") {
         console.log(couleurRouge("Veuillez choisir une option valide"));
-        choix = question(couleurQuestion(''));
+        choix = questionClr('');
     }
     if (choix === "y") {
         console.log(couleurReponse("Voici le rapport de conflits :"));
         console.log(fs.readFileSync('conflicts.txt', 'utf8'));
         console.log("Souhaitez-vous aller au Menu Principal ? (y/n)");
-        let choix2 = question(couleurQuestion(''));
+        let choix2 = questionClr('');
         while (choix2 != "y" && choix2 != "n") {
             console.log(couleurRouge("Veuillez choisir une option valide"));
-            choix2 = question(couleurQuestion(''));
+            choix2 = questionClr('');
         }
         if (choix2 === "y") {
             MenuPrincipal(scheduleAll);
