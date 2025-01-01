@@ -678,7 +678,8 @@ function MenuPrincipal(scheduleAll) {
             const [roomHoursOccupancy, percentageOccupancy] = getNumberOccupation(scheduleAll);
             console.log(couleurReponse("Taux d'occupation des salles :"));
             for (const [room, occupation] of Object.entries(roomHoursOccupancy)) {
-                console.log(couleurReponse(`\t- ${room} : ${occupation} heures soit ${percentageOccupancy[room]}%`));
+                let percent = percentageOccupancy[room].toFixed(2);
+                console.log(couleurReponse(`\t- ${room} : ${occupation} heures soit ${percent}%`));
             }
             break
         case "7":
