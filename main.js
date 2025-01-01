@@ -5,13 +5,19 @@ const fs  = require('fs');
 // Function to parse the files 
 function parseAllFiles(folderPath) {
     const allCourses = [];
-    const files = fs.readdirSync(folderPath);
-    
-    files.forEach(file => {
-        const courses = parseFile(`./SujetA_data/${file}/edt.cru`);
-        allCourses.push(...courses);
-    
-    });
+
+    if (!fs.existsSync(folderPath)) {
+        console.log(couleurRouge("Répertoire introuvable :" + folderPath));
+    } else {
+        const files = fs.readdirSync(folderPath);
+        
+        files.forEach(file => {
+            const courses = parseFile(`./SujetA_data/${file}/edt.cru`);
+            allCourses.push(...courses);
+        
+        });
+
+    }
 
     return allCourses;
 }
@@ -716,19 +722,27 @@ function MenuPrincipal(scheduleAll) {
 function verifyPathContainsCruFiles(path) {	
 	let containsCru = false;
 	let containsOnlyCru = true;
-    var files = fs.readdirSync(path);//On récupère la liste des fichiers dans le dossier
-	for (var i=0; i<files.length; i++){ //Pour chaque fichier
-		var filePath = path + '/' + files[i]; //On crée le chemin d'accès au fichier
-		var extension = files[i].split('.'); //la dernière partie de 'extension' est l'extension
-		if (fs.lstatSync(filePath).isDirectory()){ //Si c'est un dossier
-			[containsCru,containsOnlyCru] = verifyPathContainsCruFiles(filePath); //On vérifie si le dossier contient des fichiers crus
-		} else if (extension[(extension.length)-1]=='cru'){ //Si l'extension est 'cru'
-			containsCru = true; //On met containsCru à true
-		} else if (extension[(extension.length)-1]!='cru'){ //Si l'extension n'est pas 'cru'
-			containsOnlyCru = false; //On met containsOnlyCru à false
-		}
-		return [containsCru,containsOnlyCru];
-	}
+
+    if (!fs.existsSync(path)) {
+        return [false, false];
+    }  else {
+        var files = fs.readdirSync(path);//On récupère la liste des fichiers dans le dossier
+        for (var i=0; i<files.length; i++){ //Pour chaque fichier
+            var filePath = path + '/' + files[i]; //On crée le chemin d'accès au fichier
+            var extension = files[i].split('.'); //la dernière partie de 'extension' est l'extension
+            if (fs.lstatSync(filePath).isDirectory()){ //Si c'est un dossier
+                [containsCru,containsOnlyCru] = verifyPathContainsCruFiles(filePath); //On vérifie si le dossier contient des fichiers crus
+            } else if (extension[(extension.length)-1]=='cru'){ //Si l'extension est 'cru'
+                containsCru = true; //On met containsCru à true
+            } else if (extension[(extension.length)-1]!='cru'){ //Si l'extension n'est pas 'cru'
+                containsOnlyCru = false; //On met containsOnlyCru à false
+            }
+            return [containsCru,containsOnlyCru];
+        }
+    }
+    
+
+   
 }
 
 //fonction d'accueil (appelée au début avant le Menu principal)
