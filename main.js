@@ -26,6 +26,31 @@ function parseAllFiles(folderPath) {
 
 // SPEC 1 et 4 Vérifier l'occupation d'une salle et  Trouver les salles disponibles pour un créneau donné avec les capacités
 
+// [EVOL] - Améliorer le code compact J.BOYER
+
+//fonction qui permet de vérifier si une salle est occupée à un créneau donné
+// function isRoomOccupied(schedule, room, time) {
+//     const courses = Object.values(schedule);
+//     for (let course of courses) {
+//         if (course.room === room && course.time === time) {
+//             return true;
+//         }
+//     }
+//     return false;
+// }
+
+// fonction qui permet d'avoir la capcité maximale d'une salle donnée
+// function getRoomCapacity(schedule, room) {
+//     const courses = Object.values(schedule); 
+//     let maxCapacity = 0;
+//     for (let course of courses) {
+//         if (course.room === room && course.capacity > maxCapacity) {
+//             maxCapacity = course.capacity;
+//         }
+//     }
+//     return maxCapacity;
+// }
+
 //fonction qui permet de vérifier si une salle est occupée à un créneau donné
 function isRoomOccupied(schedule, room, time) {
     const courses = Object.values(schedule);
@@ -39,15 +64,9 @@ function isRoomOccupied(schedule, room, time) {
 
 // fonction qui permet d'avoir la capcité maximale d'une salle donnée
 function getRoomCapacity(schedule, room) {
-    const courses = Object.values(schedule); 
-    let maxCapacity = 0;
-    for (let course of courses) {
-        if (course.room === room && course.capacity > maxCapacity) {
-            maxCapacity = course.capacity;
-        }
-    }
-    return maxCapacity;
+    return Math.max( 0, ...Object.values(schedule).filter(course => course.room === room).map(course => course.capacity) );
 }
+
 
 //fonction qui permet de trouver les salles disponibles ayant une capacité suffisante à un créneau donné
 function findAvailableRooms(schedule, time, capacity) {
@@ -322,12 +341,15 @@ END:VEVENT
                 addEventToICS(event);
             }
             // On incrémente dayCode
-            if (dayCode == 6){
-                dayCode = 0;
-            }
-            else {
-                dayCode = dayCode + 1;
-            }
+            // if (dayCode == 6){
+            //     dayCode = 0;
+            // }
+            // else {
+            //     dayCode = dayCode + 1;
+            // }
+
+            // [EVOL] - Améliorer le code compact J.BOYER
+            dayCode = (dayCode == 6) ? 0 : dayCode++; // jour de la semaine suivant
             
            }
         }
