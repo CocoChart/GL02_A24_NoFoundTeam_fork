@@ -82,17 +82,53 @@ function findAvailableRooms(schedule, time, capacity) {
 // SPEC 2. Accèder aux créneaux disponibles d'une salle donnée avec la capacité max de la salle
 
 //fonction qui permet de trouver les créneaux disponibles pour une salle donnée
-function findAvailableSlots(schedule, salle) {
-    const creneaux = [];
-    const courses = Object.values(schedule);
+// function findAvailableSlots(schedule, salle) {
+//     const creneaux = [];
+//     const courses = Object.values(schedule);
 
-    for (const course of courses) {
-        if (course.room === salle) {
-            creneaux.push(course.time);
-        }
-    }
-    return creneaux.sort(); 
+//     for (const course of courses) {
+//         if (course.room === salle) {
+//             creneaux.push(course.time);
+//         }
+//     }
+//     return creneaux.sort(); 
+// }
+
+
+// Fix Bug ordre de tri par jour et par heure J- BOYER
+//fonction qui permet de trouver les créneaux disponibles pour une salle donnée
+function findAvailableSlots(schedule, salle) {
+    const courses = Object.values(schedule);
+    const creneaux = courses.filter(el=>el.room==salle).map(el=>el.time);
+
+    const dayOfWeek = {
+        D: 0,  // Dimanche
+        L: 1,  // Lundi
+        MA: 2, // Mardi
+        ME: 3, // Mercredi
+        J: 4,  // Jeudi
+        V: 5,  // Vendredi
+        S: 6   // Samedi
+    };
+
+    const creneauxTri = creneaux.sort((a, b) => {
+            let dayA = a.split(" ")[0].trim();
+            let creneauA = a.split(" ")[1].trim();
+            let hourStartA = parseInt(creneauA.split("-")[0]);
+            
+            let dayB = b.split(" ")[0].trim();
+            let creneauB = b.split(" ")[1].trim();
+            let hourStartB = parseInt(creneauB.split("-")[0]);
+        
+            return (dayOfWeek[dayA] -  dayOfWeek[dayB]) || (hourStartA - hourStartB) ;
+    });
+
+          
+    return creneauxTri; 
 }
+
+
+
 
 
 function getCoursesByRoomAndSlot(schedule, salle,crenau) {
