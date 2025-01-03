@@ -818,50 +818,62 @@ function verifyPathContainsCruFiles(path) {
 //fonction d'accueil (appelée au début avant le Menu principal)
 function welcome() {
     console.log(couleurTitre("\n Welcome ! "));
-    
-    let path = questionClr("Entrez le chemin d'accès du dossier Data contenant les fichiers .cru :");
-    const scheduleAll = parseAllFiles(path);
-    if (verifyPathContainsCruFiles(path)[0] == false) {
-        console.log(couleurRouge("Le dossier ne contient pas de fichiers .cru"));
-        welcome();
-    } else if (verifyPathContainsCruFiles(path)[1] == false) {
-        console.log(couleurRouge("Le dossier contient des fichiers autres que .cru"));
-        welcome();
-    } else {
 
-    //console.log(scheduleAll);
-    conflicts = verifyConflicts(scheduleAll);
-    //create file txt with conflicts 
-    writeConflicts(conflicts);
-    console.log(couleurReponse("Le rapport de conflits a été généré"));
-    console.log('Voulez vous afficher le rapport de conflits ? (y/n)');
-    let choix = questionClr('');
-    while (choix != "y" && choix != "n") {
-        console.log(couleurRouge("Veuillez choisir une option valide"));
-        choix = questionClr('');
+    let choix = questionClr("Voulez-vous analyser un fichier ou un dossier ? (fichier/dossier) : ").toLowerCase();
+    while (choix !== "fichier" && choix !== "dossier") {
+        console.log(couleurRouge("Veuillez choisir une option valide : fichier ou dossier."));
+        choix = questionClr("Voulez-vous analyser un fichier ou un dossier ? (fichier/dossier) : ").toLowerCase();
     }
+
+    if (choix === "dossier") {
+        let path = questionClr("Entrez le chemin d'accès du dossier contenant les fichiers .cru : ");
+        if (!verifyPathContainsCruFiles(path)[0]) {
+            console.log(couleurRouge("Le dossier ne contient pas de fichiers .cru valides."));
+            return welcome();
+        }
+        const scheduleAll = parseAllFiles(path);
+        processSchedule(scheduleAll);
+    } else if (choix === "fichier") {
+        let filePath = questionClr("Entrez le chemin d'accès du fichier .cru : ");
+        if (!fs.existsSync(filePath) || !filePath.endsWith(".cru")) {
+            console.log(couleurRouge("Le fichier spécifié n'est pas valide ou n'existe pas."));
+            return welcome();
+        }
+        const scheduleAll = parseFile(filePath);
+        processSchedule(scheduleAll);
+    }
+}
+
+function processSchedule(scheduleAll) {
+    const conflicts = verifyConflicts(scheduleAll);
+    writeConflicts(conflicts);
+
+    console.log(couleurReponse("Le rapport de conflits a été généré."));
+    let choix = questionClr("Voulez-vous afficher le rapport de conflits ? (y/n) : ").toLowerCase();
+    while (choix !== "y" && choix !== "n") {
+        console.log(couleurRouge("Veuillez choisir une option valide."));
+        choix = questionClr("Voulez-vous afficher le rapport de conflits ? (y/n) : ").toLowerCase();
+    }
+
     if (choix === "y") {
         console.log(couleurReponse("Voici le rapport de conflits :"));
         console.log(fs.readFileSync('conflicts.txt', 'utf8'));
-        console.log("Souhaitez-vous aller au Menu Principal ? (y/n)");
-        let choix2 = questionClr('');
-        while (choix2 != "y" && choix2 != "n") {
-            console.log(couleurRouge("Veuillez choisir une option valide"));
-            choix2 = questionClr('');
-        }
-        if (choix2 === "y") {
-            MenuPrincipal(scheduleAll);
-        }
-        else {
-            console.log(couleurReponse("Au revoir !"));
-            exit();
-        }
     }
-    else {
+
+    choix = questionClr("Souhaitez-vous aller au Menu Principal ? (y/n) : ").toLowerCase();
+    while (choix !== "y" && choix !== "n") {
+        console.log(couleurRouge("Veuillez choisir une option valide."));
+        choix = questionClr("Souhaitez-vous aller au Menu Principal ? (y/n) : ").toLowerCase();
+    }
+
+    if (choix === "y") {
         MenuPrincipal(scheduleAll);
+    } else {
+        console.log(couleurReponse("Au revoir !"));
+        exit();
     }
 }
-}
+
 
 
 //MenuPrincipal();
