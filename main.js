@@ -552,8 +552,12 @@ function verifyConflicts(schedule) {
     const listTimeRoom = {};
     const conflicts = {}; 
     const courses = Object.values(schedule);
-    
+
     for (const course of courses) {
+        if (course.room === "EXT1") {
+            continue; // Ignorer les cours avec la salle EXT1
+        }
+
         const timeRoom = `${course.room}-${course.time}`;
 
         if (!listTimeRoom[timeRoom]) {
@@ -564,11 +568,12 @@ function verifyConflicts(schedule) {
 
         if (listTimeRoom[timeRoom].length > 1) {
             conflicts[timeRoom] = listTimeRoom[timeRoom]; 
-          }
+        }
     }
 
     return conflicts;
 }
+
 
 //fonction qui permet d'écrire un rapport de conflits dans un fichier txt
 function writeConflicts(conflicts) {
