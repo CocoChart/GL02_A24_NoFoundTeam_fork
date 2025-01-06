@@ -9,15 +9,15 @@ function parseFile(filePath) {
 
     lines.forEach(line => {
         if (line.startsWith('+')) {
-            // Update current course (e.g., +AP03)
+            // Mise à jour du cours actuel (ex : +AP03)
             currentCourse = line.slice(1).trim();
         } else if (line.trim() && currentCourse) {
-            // Parse session details
+            // Parse des détails de session (ex : 1,D1,P=25,H=V 9:00-12:00,F1,S=B103)
             const parts = line.split(',');
             if (parts.length >= 6 && line.includes('H=') && line.includes('S=')) { 
                 const [index, type, capacity, timing, group, room] = parts;
                 courses.push({
-                    courseId: currentCourse, // Include course ID
+                    courseId: currentCourse, // Ajout de l'ID du cours
                     index: parseInt(index),
                     type: type.trim(),
                     capacity: parseInt(capacity.split('=')[1]),

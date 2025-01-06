@@ -2,7 +2,7 @@
 const { parseFile } = require('./parser');
 const fs  = require('fs');
 
-// Function to parse the files 
+// Fonction pour parser tous les fichiers d'un répertoire
 function parseAllFiles(folderPath) {
     const allCourses = [];
 
@@ -28,7 +28,7 @@ function parseAllFiles(folderPath) {
 
 // [EVOL] - Améliorer le code compact J.BOYER
 
-//fonction qui permet de vérifier si une salle est occupée à un créneau donné
+//Fonction permettant de vérifier si une salle est occupée à un créneau donné
 // function isRoomOccupied(schedule, room, time) {
 //     const courses = Object.values(schedule);
 //     for (let course of courses) {
@@ -39,7 +39,7 @@ function parseAllFiles(folderPath) {
 //     return false;
 // }
 
-// fonction qui permet d'avoir la capcité maximale d'une salle donnée
+// Fonction permettant d'avoir la capcité maximale d'une salle donnée
 // function getRoomCapacity(schedule, room) {
 //     const courses = Object.values(schedule); 
 //     let maxCapacity = 0;
@@ -51,7 +51,7 @@ function parseAllFiles(folderPath) {
 //     return maxCapacity;
 // }
 
-//fonction qui permet de vérifier si une salle est occupée à un créneau donné
+//Fonction permettant de vérifier si une salle est occupée à un créneau donné
 function isRoomOccupied(schedule, room, time) {
     const courses = Object.values(schedule);
     for (let course of courses) {
@@ -62,19 +62,19 @@ function isRoomOccupied(schedule, room, time) {
     return false;
 }
 
-// fonction qui permet d'avoir la capcité maximale d'une salle donnée
+//Fonction permettant d'avoir la capacité maximale d'une salle donnée
 function getRoomCapacity(schedule, room) {
     return Math.max( 0, ...Object.values(schedule).filter(course => course.room === room).map(course => course.capacity) );
 }
 
 
-//fonction qui permet de trouver les salles disponibles ayant une capacité suffisante à un créneau donné
+//Fonction permettant de trouver les salles disponibles ayant une capacité suffisante à un créneau donné
 function findAvailableRooms(schedule, time, capacity) {
     const listRooms = [];
     const availableRooms = [];
     const courses = Object.values(schedule);
 
-    //récupère la liste des salles
+    //Récupère la liste des salles
     for (const course of courses) {
         if (!listRooms.includes(course.room)) {
             //console.log(course.room);
@@ -100,7 +100,7 @@ function findAvailableRooms(schedule, time, capacity) {
 
 // SPEC 2. Accèder aux créneaux disponibles d'une salle donnée avec la capacité max de la salle
 
-//fonction qui permet de trouver les créneaux disponibles pour une salle donnée
+//Fonction permettant de trouver les créneaux disponibles pour une salle donnée
 // function findAvailableSlots(schedule, salle) {
 //     const creneaux = [];
 //     const courses = Object.values(schedule);
@@ -115,7 +115,7 @@ function findAvailableRooms(schedule, time, capacity) {
 
 
 // Fix Bug ordre de tri par jour et par heure J- BOYER
-//fonction qui permet de trouver les créneaux disponibles pour une salle donnée
+//Fonction permettant de trouver les créneaux disponibles pour une salle donnée
 function findAvailableSlots(schedule, salle) {
     const courses = Object.values(schedule);
     const creneaux = courses.filter(el=>el.room==salle).map(el=>el.time);
@@ -189,7 +189,7 @@ function findCourseSchedule(schedule, courseName) {
 
 // SPEC 5. Classer les salles par capacité d'accueil max 
 
-//Fonction qui classe les salles en fonction de leur capacité d'accueil
+//Fonction pour classer les salles en fonction de leur capacité d'accueil
 function geRoomsByCapcity(schedule) {
     const rooms = [];
     const roomsNames=[]; //Contient le nom des salles déja ajoutées au tableau rooms
@@ -267,7 +267,7 @@ function getNumberOccupation(schedule) {
 function generateICalendar(dateDebut, dateFin, courses, scheduleAll) {
 
     // **Fonction imbriquée (NESTED) interne
-    // ajoute chaque event crée dans createEventsForCourses dans icsContent
+    // Ajoute chaque event créé dans createEventsForCourses dans icsContent
     function addEventToICS(event) {
         const eventContent = `
 BEGIN:VEVENT
@@ -284,8 +284,7 @@ END:VEVENT
     };
 
     // **Fonction imbriquée (NESTED) 
-    // crée et insére dans le calendrier des évenements à chaque occurence du cours 
-    // choisi par l'utilisateur
+    // Crée et insère dans le calendrier des évenements chaque occurence du cours choisi par l'utilisateur
     function createEventsForCourses(schedule, course, period){
         // initialisation variables
         let event = [];
@@ -297,14 +296,14 @@ END:VEVENT
         // On détermine les horaires et les salles du cours en input
         let creneau = findCourseSchedule(schedule, course);
 
-        // pour chaque créneau de cours, on cycle sur toute la longueur de la période du calendrier.
-        // Si le jour de la semaine incrémentale matche le jour ou se déroule le cours chaque semaine,
-        // on crée une structure event, contenant les information relatives à ce cours, en dates absolues 
-        // ex : Date du début de l'event = 20241205T170000Z 
-        //              Soit 20241205 pour le 05/12/2024
-        //              T pour le time ici 17:00:00
-        //              Z pour indique le fuseau horaire UTC
-        // On travaille en UTC, ça sera plus simple pour la portabilité du fichier.
+        /* Pour chaque créneau de cours, on cycle sur toute la longueur de la période du calendrier.
+        Si le jour de la semaine incrémentale correspond au jour où se déroule le cours chaque semaine,
+        on crée une structure event, contenant les information relatives à ce cours, en dates absolues 
+        ex : Date du début de l'event = 20241205T170000Z 
+                      Soit 20241205 pour le 05/12/2024
+                      T pour le time ici 17:00:00
+                      Z pour indique le fuseau horaire UTC
+        On travaille en UTC, ça sera plus simple pour la portabilité du fichier.*/
 
         for (const i of creneau){
             // console.log("i =", i);
@@ -312,7 +311,7 @@ END:VEVENT
            // On parse (regex) la string time d'un cours pour récupérer les infos dans une structure eventInfo
            let dayCode = period.dayIndex;
 
-           // pour toute la longueur de la période spécifiée par l'utilisateur on cycle
+           // On cycle pour toute la longueur de la période spécifiée par l'utilisateur  
            for (let j = 0; j < period.differenceInDays; j++){
             currentDate = addDaysToUTCDate(period.dateStart, j); // On cycle la date en la mettant à jour avec dateDebut + j eme jour.
             // console.log("current date : ", currentDate);
@@ -331,7 +330,7 @@ END:VEVENT
                 event = {
                     uid     : randomUid,                                                          // Nom du cours, à modifier pour un uid random ?
                     dtstamp : todayDate.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z",
-                    start   : startDate.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z",   //on formatte la date pour ics
+                    start   : startDate.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z",   //on formate la date pour ics
                     end     : endDate.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z",
                     summary : course,                                                             // summary arbitraire à changer
                     location: i.room,                                                             // La salle de cours
@@ -355,7 +354,7 @@ END:VEVENT
         }
         
         // **Fonction imbriquée (NESTED) 
-        // Formatte les données de schedule du cours donné.
+        // Formate les données de schedule du cours donné.
         function parseSchedule(courseTime) {
             // Regex pour extraire le jour et les heures de la string course.time
             const regex = /([LMAEJVSD])\s+(\d{1,2}:\d{2})-(\d{1,2}:\d{2})/;
@@ -424,7 +423,7 @@ END:VEVENT
 
 
         // Obtenir le jour de la semaine (0 = dimanche, 1 = lundi, ..., 6 = samedi) 
-        // conditionnne tout le reste de l'algo (comparaisons dans createEventsForCourses)
+        // Conditionne tout le reste de l'algo (comparaisons dans createEventsForCourses)
         const dayIndex = dateStart.getDay();
 
         // Tableau des jours de la semaine
@@ -479,7 +478,7 @@ CALSCALE:GREGORIAN
         createEventsForCourses(scheduleAll, course, period);
     };
 
-    icsContent += `END:VCALENDAR`; //finalisation du vcalendar
+    icsContent += `END:VCALENDAR`; //Finalisation du vcalendar
 
 //     console.log(`ICS CONTENT : 
 // ${icsContent}`);
@@ -532,7 +531,6 @@ function addDaysToUTCDate(dateUTC, daysToAdd) {
     date.setUTCDate(date.getUTCDate() + daysToAdd);
 
     // Retourner la date au format ISO 8601
-    // return date.toISOString();
     return date;
 };
 
@@ -547,7 +545,7 @@ function saveICSFile(icsContent, filename = 'test.ics') {
 
 // Vérification des conflits
 
-//fonction qui permet de vérifier les conflits de salle (si il y a plusieurs cours dans la même salle au même créneau)
+//Fonction permettant de vérifier les conflits de salle (si il y a plusieurs cours dans la même salle au même créneau)
 function verifyConflicts(schedule) {
     const listTimeRoom = {};
     const conflicts = {}; 
@@ -575,7 +573,7 @@ function verifyConflicts(schedule) {
 }
 
 
-//fonction qui permet d'écrire un rapport de conflits dans un fichier txt
+//Fonction permettant d'écrire un rapport de conflits dans un fichier txt
 function writeConflicts(conflicts) {
     
     const sortedConflicts = Object.keys(conflicts).sort();
@@ -589,7 +587,7 @@ function writeConflicts(conflicts) {
 
 
 
-//fonctions de test 
+//------FONCTIONS DE TESTS------
 
 // **REFACTORING #1 (début) J.BOYER
 // Fonction générique pour vérifier si une propriété existe dans l'emploi du temps
@@ -597,7 +595,7 @@ function existsInSchedule(schedule, property, value) {
     return Object.values(schedule).some(course => course[property] === value);
 }
 
-// //fonction qui permet de vérifier qu'une salle existe 
+// //Fonction permettant de vérifier qu'une salle existe 
 // function roomExistes(schedule, room) {
 //     const courses = Object.values(schedule);
 //     for (const course of courses) {
@@ -608,7 +606,7 @@ function existsInSchedule(schedule, property, value) {
 //     return false;
 // }
 //
-// //fonction qui permet de vérifier qu'un créneau horaire existe
+// //Fonction permettant de vérifier qu'un créneau horaire existe
 // function slotExistes(schedule, slot) {
 //     const courses = Object.values(schedule);
 //     for (const course of courses) {
@@ -619,7 +617,7 @@ function existsInSchedule(schedule, property, value) {
 //     return false;
 // }
 // 
-//fonction qui permet de vérifier qu'un cours existe
+//Fonction permettant de vérifier qu'un cours existe
 // function courseExistes(schedule, course) {
 //     const courses = Object.values(schedule);
 //     for (const c of courses) {
@@ -650,7 +648,7 @@ const questionClr = (str) => question(couleurQuestion(str));
 
 
 
-//fonction qui permet d'afficher le menu principal
+//Fonction permettant d'afficher et utiliser le menu principal
 function MenuPrincipal(scheduleAll) {
     
     
@@ -788,7 +786,7 @@ function MenuPrincipal(scheduleAll) {
     }
 }
 
-//Fonction qui verifie si le path rentré contient des fichiers crus 
+//Fonction vérifiant si le path rentré contient des fichiers crus 
 function verifyPathContainsCruFiles(path) {	
 	let containsCru = false;
 	let containsOnlyCru = true;
@@ -815,7 +813,7 @@ function verifyPathContainsCruFiles(path) {
    
 }
 
-//fonction d'accueil (appelée au début avant le Menu principal)
+//Fonction d'accueil (appelée au début avant le Menu principal)
 function welcome() {
     console.log(couleurTitre("\n Welcome ! "));
 
