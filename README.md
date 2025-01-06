@@ -23,7 +23,7 @@ Pour les lancer, utilisez la commande suivante dans votre terminal :
 ```bash
 npx jasmine
 ```
-Lors du premier test, il peut être demandé d'installer les packages necessaires.
+Lors du premier test, il peut être demandé d'installer les packages nécessaires.
 
 ### Lancement du programme 
 ```bash
@@ -37,7 +37,7 @@ Ensuite, le programme va analyser les données pour vous générer un rapport av
 \
 Une fois cette étape passée, vous serez dans le menu principal.
 ### Fonctionnalités
-Une fois dans le menu principal, vous avez accès à differentes fonctionnalitées :
+Une fois dans le menu principal, vous avez accès à différentes fonctionnalités :
 1) Afficher les créneaux disponibles d'une salle donnée
 2) Afficher si une salle est occupée à un créneau donné
 3) Afficher les salles et créneaux horaires d'un cours donné
@@ -49,7 +49,7 @@ Une fois dans le menu principal, vous avez accès à differentes fonctionnalité
 9) Afficher le rapport de conflits
 0) Quitter le programme
 
-Une fois la fonctionnalité indiqué, il vous sera demandé les potentielles informations supplémentaires avant de vous indiquer les résultats de votre requête.
+Une fois la fonctionnalité indiquée, il vous sera demandé les potentielles informations supplémentaires avant de vous indiquer les résultats de votre requête.
 ### Démonstration 
 Une vidéo de démonstration de l'utilisation du programme est disponible [ici](https://drive.google.com/file/d/1Wbp_kOUl3d-fjzd4SITAmiQv6SQKoJNh/view?usp=sharing).
 ## Contributeurs
